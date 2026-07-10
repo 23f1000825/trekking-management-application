@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Edit Trek</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <h2>Edit Trek</h2>
+
+    <form method="POST">
+
+        <div class="mb-3">
+            <label>Trek Name</label>
+            <input
+                type="text"
+                name="trek_name"
+                class="form-control"
+                value="{{ trek.trek_name }}"
+                required
+            >
+        </div>
+
+        <div class="mb-3">
+            <label>Location</label>
+            <input
+                type="text"
+                name="location"
+                class="form-control"
+                value="{{ trek.location }}"
+                required
+            >
+        </div>
+
+        <div class="mb-3">
+
+            <label>Difficulty</label>
+
+            <select name="difficulty" class="form-control">
+
+                <option {% if trek.difficulty=="Easy" %}selected{% endif %}>Easy</option>
+                <option {% if trek.difficulty=="Moderate" %}selected{% endif %}>Moderate</option>
+                <option {% if trek.difficulty=="Hard" %}selected{% endif %}>Hard</option>
+
+            </select>
+
+        </div>
+
+        <div class="mb-3">
+            <label>Duration</label>
+            <input
+                type="number"
+                name="duration"
+                class="form-control"
+                value="{{ trek.duration }}"
+                required
+            >
+        </div>
+
+        <div class="mb-3">
+            <label>Available Slots</label>
+            <input
+                type="number"
+                name="available_slots"
+                class="form-control"
+                value="{{ trek.available_slots }}"
+                required
+            >
+        </div>
+
+        <div class="mb-3">
+
+            <label>Status</label>
+
+            <select name="status" class="form-control">
+
+                <option {% if trek.status=="Open" %}selected{% endif %}>Open</option>
+                <option {% if trek.status=="Closed" %}selected{% endif %}>Closed</option>
+
+            </select>
+
+        </div>
+
+        <button class="btn btn-success">
+
+            Update Trek
+
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>

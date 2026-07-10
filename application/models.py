@@ -39,6 +39,11 @@ class Trek(db.Model):
         db.ForeignKey("user.user_id")
     )
 
+    assigned_staff = db.relationship(
+    "User",
+    foreign_keys=[assigned_staff_id]
+)
+
     status = db.Column(db.String(20), nullable=False)
 
     start_date = db.Column(db.Date)

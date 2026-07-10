@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Manage Staff</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+<h2>Manage Trek Staff</h2>
+
+<table class="table table-bordered">
+
+<tr>
+
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Approved</th>
+<th>Blacklisted</th>
+<th>Actions</th>
+
+</tr>
+
+{% for member in staff %}
+
+<tr>
+
+<td>{{ member.user_id }}</td>
+<td>{{ member.name }}</td>
+<td>{{ member.email }}</td>
+<td>{{ member.is_approved }}</td>
+<td>{{ member.is_blacklisted }}</td>
+
+<td>
+
+<a href="{{ url_for('approve_staff', user_id=member.user_id) }}"
+class="btn btn-success btn-sm">
+
+Approve
+
+</a>
+
+<a href="{{ url_for('blacklist_staff', user_id=member.user_id) }}"
+class="btn btn-danger btn-sm">
+
+Blacklist
+
+</a>
+
+<a href="{{ url_for('activate_staff', user_id=member.user_id) }}"
+class="btn btn-primary btn-sm">
+
+Activate
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</body>
+
+</html>

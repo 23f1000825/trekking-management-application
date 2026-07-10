@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Add Trek</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <h2>Add Trek</h2>
+
+    <form method="POST">
+
+        <div class="mb-3">
+            <label>Trek Name</label>
+            <input type="text" name="trek_name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Location</label>
+            <input type="text" name="location" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Difficulty</label>
+
+            <select name="difficulty" class="form-control">
+
+                <option>Easy</option>
+                <option>Moderate</option>
+                <option>Hard</option>
+
+            </select>
+
+        </div>
+
+        <div class="mb-3">
+            <label>Duration (Days)</label>
+            <input type="number" name="duration" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Available Slots</label>
+            <input type="number" name="available_slots" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+        
+            <label>Assign Trek Staff</label>
+
+            <select
+                name="assigned_staff"
+                class="form-control"
+            >
+
+                <option value="">
+                    No Staff Assigned
+                </option>
+
+                {% for staff in staff_members %}
+
+                <option value="{{ staff.user_id }}">
+                    {{ staff.name }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+            <label>Status</label>
+
+            <select name="status" class="form-control">
+
+                <option>Open</option>
+                <option>Closed</option>
+
+            </select>
+
+        </div>
+
+        <button class="btn btn-success">
+            Add Trek
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>
