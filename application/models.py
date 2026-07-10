@@ -1,7 +1,8 @@
+from flask_login import UserMixin
 from .database import db
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "user"
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -10,12 +11,16 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
 
     role = db.Column(db.String(20), nullable=False)
+
     is_approved = db.Column(db.Boolean, default=False)
     is_blacklisted = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
 
     bookings = db.relationship("Booking", backref="user", lazy=True)
     staff_profile = db.relationship("StaffProfile", backref="user", uselist=False)
+
+    def get_id(self):
+        return str(self.user_id)
 
 
 class Trek(db.Model):
