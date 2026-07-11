@@ -11,7 +11,11 @@ from flask_login import login_required
 from flask_login import current_user
 
 from application.database import db
-from application.models import User,Trek,Booking
+from application.models import User,Trek,Booking, StaffProfile
+
+
+
+from sqlalchemy import or_
 
 
 @app.route("/")
@@ -216,11 +220,25 @@ def edit_trek(trek_id):
 
     trek = Trek.query.get_or_404(trek_id)
 
+    staff_members = User.query.filter_by(
+        role="Trek Staff",
+        is_approved=True,
+        is_blacklisted=False
+    ).all()
+
     if request.method == "GET":
         return render_template(
-            "admin/edit_trek.html",
-            trek=trek
-        )
+        "admin/edit_trek.html",
+        trek=trek,
+        staff_members=staff_members
+    )
+
+    assigned_staff = request.form["assigned_staff"]
+
+    if assigned_staff == "":
+        trek.assigned_staff_id = None
+    else:
+        trek.assigned_staff_id = int(assigned_staff)
 
     trek.trek_name = request.form["trek_name"]
     trek.location = request.form["location"]
@@ -247,7 +265,7 @@ def delete_trek(trek_id):
 
     return redirect(url_for("view_treks"))
 
-#ADMIN APPROVE TREK STAFF
+#ADMIN STAFF VIEW
 @app.route("/admin/staff")
 @login_required
 def view_staff():
@@ -274,6 +292,31 @@ def approve_staff(user_id):
 
     staff.is_approved = True
 
+    db.session.commit()
+
+    return redirect(url_for("view_staff"))
+
+#ADMIN STAFF DELETE
+@app.route("/admin/staff/delete/<int:user_id>")
+@login_required
+def delete_staff(user_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied."
+
+    staff = User.query.get_or_404(user_id)
+
+    if staff.role != "Trek Staff":
+        return "Invalid Staff."
+
+    profile = StaffProfile.query.filter_by(
+    user_id=staff.user_id
+    ).first()
+
+    if profile:
+        db.session.delete(profile)
+
+    db.session.delete(staff)
     db.session.commit()
 
     return redirect(url_for("view_staff"))
@@ -310,4 +353,95 @@ def activate_staff(user_id):
 
     return redirect(url_for("view_staff"))
 
-#
+#ADMIN USER VIEW
+@app.route("/admin/users")
+@login_required
+def view_users():
+
+    if current_user.role != "Admin":
+        return "Access Denied."
+
+    users = User.query.filter_by(role="User").all()
+
+    return render_template(
+        "admin/view_users.html",
+        users=users
+    )
+
+#BLACKLIST USER
+@app.route("/admin/users/blacklist/<int:user_id>")
+@login_required
+def blacklist_user(user_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied."
+
+    user = User.query.get_or_404(user_id)
+
+    user.is_blacklisted = True
+
+    db.session.commit()
+
+    return redirect(url_for("view_users"))
+
+#ACTIVATE USER
+@app.route("/admin/users/activate/<int:user_id>")
+@login_required
+def activate_user(user_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied."
+
+    user = User.query.get_or_404(user_id)
+
+    user.is_blacklisted = False
+
+    db.session.commit()
+
+    return redirect(url_for("view_users"))
+
+#ADMIN SEARCH 
+@app.route("/admin/search", methods=["GET", "POST"])
+@login_required
+def admin_search():
+
+    if current_user.role != "Admin":
+        return "Access Denied."
+
+    users = []
+    staff = []
+    treks = []
+
+    if request.method == "POST":
+
+        keyword = request.form["keyword"]
+
+        users = User.query.filter(
+            User.role == "User",
+            or_(
+                User.name.ilike(f"%{keyword}%"),
+                User.user_id.like(f"%{keyword}%")
+            )
+        ).all()
+
+        staff = User.query.filter(
+            User.role == "Trek Staff",
+            or_(
+                User.name.ilike(f"%{keyword}%"),
+                User.user_id.like(f"%{keyword}%")
+            )
+        ).all()
+
+        treks = Trek.query.filter(
+            or_(
+                Trek.trek_name.ilike(f"%{keyword}%"),
+                Trek.trek_id.like(f"%{keyword}%")
+            )
+        ).all()
+
+    return render_template(
+        "admin/search.html",
+        users=users,
+        staff=staff,
+        treks=treks
+    )

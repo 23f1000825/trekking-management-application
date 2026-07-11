@@ -77,6 +77,32 @@
 
         <div class="mb-3">
 
+            <label>Assign Trek Staff</label>
+
+            <select
+            name="assigned_staff"
+            class="form-control">
+
+        <option value="">No Staff Assigned</option>
+
+            {% for staff in staff_members %}
+
+        <option
+        value="{{ staff.user_id }}"
+        {% if trek.assigned_staff_id == staff.user_id %}selected{% endif %}>
+
+        {{ staff.name }}
+
+        </option>
+
+        {% endfor %}
+
+        </select>
+
+        </div>
+
+        <div class="mb-3">
+
             <label>Status</label>
 
             <select name="status" class="form-control">
