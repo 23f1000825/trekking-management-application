@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>My Bookings</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+<h2>My Bookings</h2>
+
+<hr>
+
+<table class="table table-bordered">
+
+<tr>
+
+<th>Trek</th>
+<th>Location</th>
+<th>Booking Status</th>
+<th>Trek Status</th>
+
+</tr>
+
+{% for booking in bookings %}
+
+<tr>
+
+<td>{{ booking.trek.trek_name }}</td>
+
+<td>{{ booking.trek.location }}</td>
+
+<td>{{ booking.booking_status }}</td>
+
+<td>{{ booking.trek.status }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<hr>
+
+<h2>Trekking History</h2>
+
+<table class="table table-bordered">
+
+<tr>
+
+<th>Trek</th>
+<th>Location</th>
+<th>Booking Status</th>
+
+</tr>
+
+{% for booking in history %}
+
+<tr>
+
+<td>{{ booking.trek.trek_name }}</td>
+
+<td>{{ booking.trek.location }}</td>
+
+<td>{{ booking.booking_status }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% if history|length == 0 %}
+
+<div class="alert alert-info">
+
+No completed treks yet.
+
+</div>
+
+{% endif %}
+
+{% if bookings|length == 0 %}
+
+<div class="alert alert-info">
+
+You have not booked any treks yet.
+
+</div>
+
+{% endif %}
+
+<a
+href="{{ url_for('user_dashboard') }}"
+class="btn btn-secondary">
+
+Back
+
+</a>
+
+</div>
+
+</body>
+
+</html>

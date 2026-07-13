@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     is_blacklisted = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
 
-    bookings = db.relationship("Booking", backref="user", lazy=True)
+    bookings = db.relationship("Booking", back_populates="user", cascade="all, delete-orphan")
     staff_profile = db.relationship("StaffProfile", backref="user", uselist=False)
 
     def get_id(self):
@@ -49,7 +49,7 @@ class Trek(db.Model):
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
 
-    bookings = db.relationship("Booking", backref="trek", lazy=True)
+    bookings = db.relationship("Booking", back_populates="trek",cascade="all, delete-orphan")
 
 
 class Booking(db.Model):
@@ -80,6 +80,9 @@ class Booking(db.Model):
         db.String(20),
         default="Pending"
     )
+
+    user = db.relationship("User", back_populates="bookings")
+    trek = db.relationship("Trek", back_populates="bookings")
 
 
 class StaffProfile(db.Model):
