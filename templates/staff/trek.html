@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>{{ trek.trek_name }}</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+<h2>{{ trek.trek_name }}</h2>
+
+<hr>
+
+<form method="POST">
+
+<div class="mb-3">
+
+<label>Location</label>
+
+<input
+class="form-control"
+value="{{ trek.location }}"
+readonly>
+
+</div>
+
+<div class="mb-3">
+
+<label>Difficulty</label>
+
+<input
+class="form-control"
+value="{{ trek.difficulty }}"
+readonly>
+
+</div>
+
+<div class="mb-3">
+
+<label>Duration</label>
+
+<input
+class="form-control"
+value="{{ trek.duration }}"
+readonly>
+
+</div>
+
+<div class="mb-3">
+
+<label>Available Slots</label>
+
+<input
+type="number"
+name="available_slots"
+class="form-control"
+value="{{ trek.available_slots }}"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Status</label>
+
+<select
+name="status"
+class="form-select">
+
+<option value="Open" {% if trek.status=="Open" %}selected{% endif %}>Open</option>
+
+<option value="Closed" {% if trek.status=="Closed" %}selected{% endif %}>Closed</option>
+
+<option value="Started" {% if trek.status=="Started" %}selected{% endif %}>Started</option>
+
+<option value="Ongoing" {% if trek.status=="Ongoing" %}selected{% endif %}>Ongoing</option>
+
+<option value="Completed" {% if trek.status=="Completed" %}selected{% endif %}>Completed</option>
+
+</select>
+
+</div>
+
+<button class="btn btn-success">
+
+Update Trek
+
+</button>
+
+<a
+href="{{ url_for('staff_dashboard') }}"
+class="btn btn-secondary">
+
+Back
+
+</a>
+
+</form>
+
+</div>
+
+</body>
+
+</html>

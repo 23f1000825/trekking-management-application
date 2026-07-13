@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Participants</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+<h2>{{ trek.trek_name }}</h2>
+
+<hr>
+
+<table class="table table-bordered">
+
+<tr>
+
+<th>User ID</th>
+<th>Name</th>
+<th>Booking Status</th>
+
+</tr>
+
+{% for booking in bookings %}
+
+<tr>
+
+<td>{{ booking.user.user_id }}</td>
+
+<td>{{ booking.user.name }}</td>
+
+<td>{{ booking.booking_status }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% if bookings|length == 0 %}
+
+<div class="alert alert-info">
+
+No participants yet.
+
+</div>
+
+{% endif %}
+
+<a
+href="{{ url_for('staff_dashboard') }}"
+class="btn btn-secondary">
+
+Back
+
+</a>
+
+</div>
+
+</body>
+
+</html>
