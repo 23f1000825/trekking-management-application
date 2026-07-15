@@ -347,7 +347,7 @@ def add_trek():
 
     duration = int(request.form["duration"])
 
-    trek.end_date = start_date + timedelta(days=trek.duration)
+    end_date = start_date + timedelta(days=duration)
 
     trek = Trek(
         trek_name=request.form["trek_name"],
