@@ -1,7 +1,7 @@
 {% extends "base_dashboard.html" %}
 
 {% block title %}
-My Bookings
+Trekking History
 {% endblock %}
 
 {% block panel_title %}
@@ -18,12 +18,12 @@ Trekker Panel
     </a>
 
     <a href="{{ url_for('user_bookings') }}"
-       class="list-group-item list-group-item-action active">
+       class="list-group-item list-group-item-action">
         My Bookings
     </a>
 
     <a href="{{ url_for('user_history') }}"
-        class="list-group-item list-group-item-action">
+       class="list-group-item list-group-item-action active">
         History
     </a>
 
@@ -37,7 +37,6 @@ Trekker Panel
         Logout
     </a>
 
-
 </div>
 
 {% endblock %}
@@ -45,7 +44,7 @@ Trekker Panel
 {% block content %}
 
 <h2 class="mb-4">
-    My Bookings
+    Trekking History
 </h2>
 
 <table class="table table-bordered align-middle">
@@ -66,7 +65,7 @@ Trekker Panel
 
     <tbody>
 
-        {% for booking in bookings %}
+        {% for booking in history %}
 
         <tr>
 
@@ -115,11 +114,11 @@ Trekker Panel
 
 </table>
 
-{% if bookings|length == 0 %}
+{% if history|length == 0 %}
 
 <div class="alert alert-info">
 
-    You have no active bookings.
+    No trekking history found.
 
 </div>
 

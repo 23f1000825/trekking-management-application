@@ -22,6 +22,11 @@ Trekker Panel
         My Bookings
     </a>
 
+    <a href="{{ url_for('user_history') }}"
+        class="list-group-item list-group-item-action">
+        History
+    </a>
+
     <a href="{{ url_for('user_profile') }}"
        class="list-group-item list-group-item-action">
         Profile
@@ -73,12 +78,12 @@ Trekker Panel
 
         </select>
 
-        <input
+       <input
         type="text"
-        name="location"
-        class="form-control me-2"
-        placeholder="Location"
-        value="{{ location }}">
+        name="keyword"
+        class="form-control"
+        placeholder="Search trek or location"
+        value="{{ keyword }}">
 
         <button class="btn btn-primary">
             Filter
@@ -96,6 +101,7 @@ Trekker Panel
 
 <th>Trek Name</th>
 <th>Location</th>
+<th>Dates</th>
 <th>Difficulty</th>
 <th>Duration</th>
 <th>Available Slots</th>
@@ -114,6 +120,16 @@ Trekker Panel
 <td>{{ trek.trek_name }}</td>
 
 <td>{{ trek.location }}</td>
+
+<td>
+{% if trek.start_date and trek.end_date %}
+    {{ trek.start_date.strftime('%d %b %Y') }}
+    -
+    {{ trek.end_date.strftime('%d %b %Y') }}
+{% else %}
+    -
+{% endif %}
+</td>
 
 <td>{{ trek.difficulty }}</td>
 

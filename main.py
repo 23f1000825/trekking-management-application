@@ -5,7 +5,7 @@ from application.config import LocalDevelopmentConfig
 from application.database import db
 from application.database import login_manager
 from application.models import User
-
+from sqlalchemy import or_
 app = None
 
 

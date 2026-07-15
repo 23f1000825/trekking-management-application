@@ -1,15 +1,47 @@
-<!DOCTYPE html>
-<html>
+{% extends "base_dashboard.html" %}
 
-<head>
+{% block title %}
+My Profile
+{% endblock %}
 
-<title>User Profile</title>
+{% block panel_title %}
+Trekker Panel
+{% endblock %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block sidebar %}
 
-</head>
+<div class="list-group list-group-flush">
 
-<body>
+    <a href="{{ url_for('user_dashboard') }}"
+       class="list-group-item list-group-item-action active">
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('user_bookings') }}"
+       class="list-group-item list-group-item-action">
+        My Bookings
+    </a>
+
+    <a href="{{ url_for('user_history') }}"
+        class="list-group-item list-group-item-action">
+        History
+    </a>
+
+    <a href="{{ url_for('user_profile') }}"
+       class="list-group-item list-group-item-action">
+        Profile
+    </a>
+
+    <a href="{{ url_for('logout') }}"
+       class="list-group-item list-group-item-action text-danger">
+        Logout
+    </a>
+
+</div>
+
+{% endblock %}
+
+{% block content %}
 
 <div class="container mt-5">
 
@@ -56,6 +88,6 @@ Update
 
 </div>
 
-</body>
 
-</html>
+
+{% endblock %}

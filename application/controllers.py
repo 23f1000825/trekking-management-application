@@ -188,6 +188,8 @@ def staff_dashboard():
     )
 
 
+from sqlalchemy import or_    
+
 @app.route("/user/dashboard")
 @login_required
 def user_dashboard():
@@ -196,19 +198,23 @@ def user_dashboard():
         return "Access Denied."
 
     difficulty = request.args.get("difficulty", "")
-    location = request.args.get("location", "")
+    keyword = request.args.get("keyword", "")
 
     treks = Trek.query.filter_by(status="Open")
 
     if difficulty:
         treks = treks.filter(Trek.difficulty == difficulty)
 
-    if location:
-        treks = treks.filter(Trek.location.ilike(f"%{location}%"))
+    if keyword:
+        treks = treks.filter(
+            or_(
+                Trek.trek_name.ilike(f"%{keyword}%"),
+                Trek.location.ilike(f"%{keyword}%")
+            )
+        )
 
     treks = treks.all()
-
-    my_bookings = Booking.query.filter_by(
+    bookings = Booking.query.filter_by(
         user_id=current_user.user_id,
         booking_status="Booked"
     ).all()
@@ -216,9 +222,9 @@ def user_dashboard():
     return render_template(
         "user/dashboard.html",
         treks=treks,
-        my_bookings=my_bookings,
+        my_bookings=bookings,
         difficulty=difficulty,
-        location=location
+        keyword=keyword
     )
 
 #ADMIN CRUD OPS
@@ -803,15 +809,32 @@ def user_bookings():
     if current_user.role != "User":
         return "Access Denied."
 
-    bookings = Booking.query.filter_by(
-        user_id=current_user.user_id
-    ).order_by(
-        Booking.booking_date.desc()
+    bookings = Booking.query.filter(
+        Booking.user_id == current_user.user_id,
+        Booking.booking_status != "Completed",
+        Booking.booking_status != "Cancelled"
     ).all()
 
     return render_template(
         "user/bookings.html",
         bookings=bookings
+    )
+
+@app.route("/user/history")
+@login_required
+def user_history():
+
+    if current_user.role != "User":
+        return "Access Denied."
+
+    history = Booking.query.filter(
+        Booking.user_id == current_user.user_id,
+        Booking.booking_status.in_(["Completed", "Cancelled"])
+    ).all()
+
+    return render_template(
+        "user/history.html",
+        history=history
     )
 
 @app.route("/user/cancel/<int:booking_id>")
