@@ -1,85 +1,218 @@
-<!DOCTYPE html>
-<html>
+{% extends "base_dashboard.html" %}
 
-<head>
+{% block title %}
+Search
+{% endblock %}
 
-<title>Search</title>
+{% block sidebar %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<div class="list-group list-group-flush">
 
-</head>
+    <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action">
+        Dashboard
+    </a>
 
-<body>
+    <a href="{{ url_for('view_treks') }}" class="list-group-item list-group-item-action">
+        Treks
+    </a>
 
-<div class="container mt-5">
+    <a href="{{ url_for('view_staff') }}" class="list-group-item list-group-item-action">
+        Staff
+    </a>
 
-<h2>Search</h2>
+    <a href="{{ url_for('view_users') }}" class="list-group-item list-group-item-action">
+        Users
+    </a>
 
-<form method="POST">
+    <a href="{{ url_for('admin_bookings') }}" class="list-group-item list-group-item-action">
+        Bookings
+    </a>
 
-<div class="mb-3">
+    <a href="{{ url_for('admin_search') }}" class="list-group-item list-group-item-action active">
+        Search
+    </a>
 
-<input
-type="text"
-name="keyword"
-class="form-control"
-placeholder="Enter User ID, Staff ID, Trek ID or Name"
-required>
+    <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action text-danger">
+        Logout
+    </a>
 
 </div>
 
-<button class="btn btn-primary">
+{% endblock %}
 
-Search
+{% block content %}
 
-</button>
+<h2 class="mb-4">
+    Search
+</h2>
+
+<form method="POST" class="mb-4">
+
+    <div class="input-group">
+
+        <input
+            type="text"
+            name="keyword"
+            class="form-control"
+            placeholder="Search by ID or Name..."
+            value="{{ keyword }}"
+            required
+        >
+
+        <button
+            type="submit"
+            class="btn btn-primary">
+            Search
+        </button>
+
+    </div>
 
 </form>
 
-<hr>
+{% if users %}
 
-<h4>Users</h4>
+<h4 class="mt-4">
+    Users
+</h4>
 
-<ul>
+<div class="table-responsive">
 
-{% for user in users %}
+<table class="table table-bordered table-hover">
 
-<li>{{ user.user_id }} - {{ user.name }}</li>
+    <thead class="table-light">
 
-{% endfor %}
+        <tr>
 
-</ul>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
 
-<hr>
+        </tr>
 
-<h4>Trek Staff</h4>
+    </thead>
 
-<ul>
+    <tbody>
 
-{% for member in staff %}
+        {% for user in users %}
 
-<li>{{ member.user_id }} - {{ member.name }}</li>
+        <tr>
 
-{% endfor %}
+            <td>{{ user.user_id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
 
-</ul>
+        </tr>
 
-<hr>
+        {% endfor %}
 
-<h4>Treks</h4>
+    </tbody>
 
-<ul>
-
-{% for trek in treks %}
-
-<li>{{ trek.trek_id }} - {{ trek.trek_name }}</li>
-
-{% endfor %}
-
-</ul>
+</table>
 
 </div>
 
-</body>
+{% endif %}
 
-</html>
+{% if staff %}
+
+<h4 class="mt-5">
+    Trek Staff
+</h4>
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover">
+
+    <thead class="table-light">
+
+        <tr>
+
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        {% for member in staff %}
+
+        <tr>
+
+            <td>{{ member.user_id }}</td>
+            <td>{{ member.name }}</td>
+            <td>{{ member.email }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+</div>
+
+{% endif %}
+
+{% if treks %}
+
+<h4 class="mt-5">
+    Treks
+</h4>
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover">
+
+    <thead class="table-light">
+
+        <tr>
+
+            <th>ID</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Difficulty</th>
+            <th>Status</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        {% for trek in treks %}
+
+        <tr>
+
+            <td>{{ trek.trek_id }}</td>
+            <td>{{ trek.trek_name }}</td>
+            <td>{{ trek.location }}</td>
+            <td>{{ trek.difficulty }}</td>
+            <td>{{ trek.status }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+</div>
+
+{% endif %}
+
+{% if not users and not staff and not treks and keyword %}
+
+<div class="alert alert-warning mt-4">
+
+    No matching records found.
+
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}
+Bookings
+{% endblock %}
+
+{% block sidebar %}
+
+<div class="list-group list-group-flush">
+
+    <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action">
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('view_treks') }}" class="list-group-item list-group-item-action">
+        Treks
+    </a>
+
+    <a href="{{ url_for('view_staff') }}" class="list-group-item list-group-item-action">
+        Staff
+    </a>
+
+    <a href="{{ url_for('view_users') }}" class="list-group-item list-group-item-action">
+        Users
+    </a>
+
+    <a href="{{ url_for('admin_bookings') }}" class="list-group-item list-group-item-action active">
+        Bookings
+    </a>
+
+    <a href="{{ url_for('admin_search') }}" class="list-group-item list-group-item-action">
+        Search
+    </a>
+
+    <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action text-danger">
+        Logout
+    </a>
+
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    Booking Records
+</h2>
+
+<form method="GET" class="mb-4">
+
+    <input
+        type="text"
+        name="search"
+        value="{{ search }}"
+        class="form-control"
+        placeholder="Search bookings..."
+    >
+
+</form>
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover align-middle">
+
+    <thead class="table-light">
+
+        <tr>
+
+            <th>Booking ID</th>
+            <th>User</th>
+            <th>Trek</th>
+            <th>Booking Status</th>
+            <th>Trek Status</th>
+            <th>Booking Date</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% if bookings %}
+
+        {% for booking in bookings %}
+
+        <tr>
+
+            <td>{{ booking.booking_id }}</td>
+
+            <td>{{ booking.user.name }}</td>
+
+            <td>{{ booking.trek.trek_name }}</td>
+
+            <td>{{ booking.booking_status }}</td>
+
+            <td>{{ booking.trek.status }}</td>
+
+            <td>{{ booking.booking_date or "-" }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <tr>
+
+            <td colspan="6" class="text-center">
+                No bookings found.
+            </td>
+
+        </tr>
+
+    {% endif %}
+
+    </tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

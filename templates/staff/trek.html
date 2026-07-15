@@ -1,17 +1,43 @@
-<!DOCTYPE html>
-<html>
+{% extends "base_dashboard.html" %}
 
-<head>
+{% block title %}
+Manage Trek
+{% endblock %}
 
-<title>{{ trek.trek_name }}</title>
+{% block panel_title %}
+Staff Panel
+{% endblock %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block sidebar %}
 
-</head>
+<div class="list-group list-group-flush">
 
-<body>
+<a href="{{ url_for('staff_dashboard') }}"
+class="list-group-item list-group-item-action">
 
-<div class="container mt-5">
+Dashboard
+
+</a>
+
+<a href="{{ url_for('staff_profile') }}"
+class="list-group-item list-group-item-action">
+
+Profile
+
+</a>
+
+<a href="{{ url_for('logout') }}"
+class="list-group-item list-group-item-action text-danger">
+
+Logout
+
+</a>
+
+</div>
+
+{% endblock %}
+
+{% block content %}
 
 <h2>{{ trek.trek_name }}</h2>
 
@@ -19,77 +45,133 @@
 
 <form method="POST">
 
-<div class="mb-3">
+<div class="row">
+
+<div class="col-md-6">
 
 <label>Location</label>
 
 <input
-class="form-control"
+class="form-control mb-3"
 value="{{ trek.location }}"
 readonly>
 
-</div>
-
-<div class="mb-3">
-
-<label>Difficulty</label>
+<label>Duration (Days)</label>
 
 <input
-class="form-control"
-value="{{ trek.difficulty }}"
-readonly>
-
-</div>
-
-<div class="mb-3">
-
-<label>Duration</label>
-
-<input
-class="form-control"
+class="form-control mb-3"
 value="{{ trek.duration }}"
 readonly>
 
+<label>Start Date</label>
+
+<input
+class="form-control mb-3"
+value="{{ trek.start_date }}"
+readonly>
+
+<label>End Date</label>
+
+<input
+class="form-control mb-3"
+value="{{ trek.end_date }}"
+readonly>
+
 </div>
 
-<div class="mb-3">
+<div class="col-md-6">
+
+<label>Total Slots</label>
+
+<input
+class="form-control mb-3"
+value="{{ total_slots }}"
+readonly>
 
 <label>Available Slots</label>
 
 <input
 type="number"
 name="available_slots"
-class="form-control"
-value="{{ trek.available_slots }}"
-required>
-
-</div>
-
-<div class="mb-3">
+class="form-control mb-3"
+value="{{ trek.available_slots }}">
 
 <label>Status</label>
 
-<select
-name="status"
-class="form-select">
-
-<option value="Open" {% if trek.status=="Open" %}selected{% endif %}>Open</option>
-
-<option value="Closed" {% if trek.status=="Closed" %}selected{% endif %}>Closed</option>
-
-<option value="Started" {% if trek.status=="Started" %}selected{% endif %}>Started</option>
-
-<option value="Ongoing" {% if trek.status=="Ongoing" %}selected{% endif %}>Ongoing</option>
-
-<option value="Completed" {% if trek.status=="Completed" %}selected{% endif %}>Completed</option>
-
-</select>
+<input
+class="form-control"
+value="{{ trek.status }}"
+readonly>
 
 </div>
 
-<button class="btn btn-success">
+</div>
 
-Update Trek
+<hr>
+
+<h4>Participants ({{ bookings|length }})</h4>
+
+<table class="table table-bordered">
+
+<thead>
+
+<tr>
+
+<th>User</th>
+
+<th>Booking Date</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for booking in bookings %}
+
+<tr>
+
+<td>{{ booking.user.name }}</td>
+
+<td>
+    {% if booking.booking_date %}
+        {{ booking.booking_date.strftime('%d-%m-%Y') }}
+    {% else %}
+        -
+    {% endif %}
+</td>
+
+<td>{{ booking.booking_status }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+<div class="mt-4">
+
+<button
+type="submit"
+name="action"
+value="started"
+class="btn btn-primary">
+
+Mark as Started
+
+</button>
+
+<button
+type="submit"
+name="action"
+value="completed"
+class="btn btn-success">
+
+Mark as Completed
 
 </button>
 
@@ -101,10 +183,8 @@ Back
 
 </a>
 
-</form>
-
 </div>
 
-</body>
+</form>
 
-</html>
+{% endblock %}

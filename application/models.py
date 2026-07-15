@@ -1,5 +1,6 @@
 from flask_login import UserMixin
 from .database import db
+from datetime import date,datetime
 
 
 class User(UserMixin, db.Model):
@@ -17,7 +18,7 @@ class User(UserMixin, db.Model):
     is_active = db.Column(db.Boolean, default=True)
 
     bookings = db.relationship("Booking", back_populates="user", cascade="all, delete-orphan")
-    staff_profile = db.relationship("StaffProfile", backref="user", uselist=False)
+    staff_profile = db.relationship("StaffProfile", uselist=False)
 
     def get_id(self):
         return str(self.user_id)
@@ -69,15 +70,17 @@ class Booking(db.Model):
         nullable=False
     )
 
-    booking_date = db.Column(db.Date)
+    booking_date = db.Column(db.DateTime, nullable=False)
 
     booking_status = db.Column(
         db.String(20),
+        nullable=False,
         default="Booked"
     )
 
     payment_status = db.Column(
         db.String(20),
+        nullable=False,
         default="Pending"
     )
 

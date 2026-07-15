@@ -2,6 +2,7 @@ from flask import render_template
 from flask import request
 from flask import redirect
 from flask import url_for
+from flask import flash
 
 from flask import current_app as app
 
@@ -13,6 +14,7 @@ from flask_login import current_user
 from application.database import db
 from application.models import User,Trek,Booking, StaffProfile
 
+from datetime import date,datetime, timedelta
 
 
 from sqlalchemy import or_
@@ -151,28 +153,38 @@ def staff_dashboard():
         return "Access Denied."
 
     treks = Trek.query.filter_by(
-    assigned_staff_id=current_user.user_id
+        assigned_staff_id=current_user.user_id
     ).all()
 
     trek_data = []
 
+    total_participants = 0
+
+    open_treks = 0
+
     for trek in treks:
 
         participant_count = Booking.query.filter_by(
-        trek_id=trek.trek_id
+            trek_id=trek.trek_id,
+            booking_status="Booked"
         ).count()
+
+        total_participants += participant_count
+
+        if trek.status == "Open":
+            open_treks += 1
 
         trek_data.append({
             "trek": trek,
             "participant_count": participant_count
         })
 
-    total_treks = len(treks)
-
     return render_template(
         "staff/dashboard.html",
         trek_data=trek_data,
-        total_treks=total_treks
+        total_treks=len(treks),
+        total_participants=total_participants,
+        open_treks=open_treks
     )
 
 
@@ -196,9 +208,15 @@ def user_dashboard():
 
     treks = treks.all()
 
+    my_bookings = Booking.query.filter_by(
+        user_id=current_user.user_id,
+        booking_status="Booked"
+    ).all()
+
     return render_template(
         "user/dashboard.html",
         treks=treks,
+        my_bookings=my_bookings,
         difficulty=difficulty,
         location=location
     )
@@ -211,13 +229,20 @@ def view_treks():
     if current_user.role != "Admin":
         return "Access Denied."
 
-    treks = Trek.query.all()
+    search = request.args.get("search", "").strip()
+
+    if search:
+        treks = Trek.query.filter(
+            Trek.trek_name.ilike(f"%{search}%")
+        ).all()
+    else:
+        treks = Trek.query.all()
 
     return render_template(
         "admin/view_treks.html",
-        treks=treks
-    )
-
+        treks=treks,
+        search=search
+        )
 
 @app.route("/admin/treks/add", methods=["GET", "POST"])
 @login_required
@@ -235,24 +260,58 @@ def add_trek():
     if request.method == "GET":
         return render_template(
             "admin/add_trek.html",
-            staff_members=staff_members
+            staff_members=staff_members,
+            today=date.today().isoformat()
         )
 
     assigned_staff = request.form["assigned_staff"]
+
 
     if assigned_staff == "":
         assigned_staff = None
     else:
         assigned_staff = int(assigned_staff)
 
+    existing_trek = Trek.query.filter(
+        db.func.lower(Trek.trek_name) ==
+        request.form["trek_name"].strip().lower()
+    ).first()
+
+    if existing_trek:
+        flash("A trek with the same name already exists", "danger")
+        return render_template(
+                "admin/add_trek.html",
+                staff_members=staff_members,
+                today=date.today().isoformat()
+    )
+
+    start_date = datetime.strptime(
+        request.form["start_date"],
+        "%Y-%m-%d"
+    ).date()
+
+    if start_date < date.today():
+            flash("Start date cannot be in the past.", "danger")
+            return render_template(
+                "admin/add_trek.html",
+                staff_members=staff_members,
+                today=date.today().isoformat()
+    )
+
+    duration = int(request.form["duration"])
+
+    trek.end_date = start_date + timedelta(days=trek.duration)
+
     trek = Trek(
         trek_name=request.form["trek_name"],
         location=request.form["location"],
         difficulty=request.form["difficulty"],
-        duration=int(request.form["duration"]),
+        duration=duration,
         available_slots=int(request.form["available_slots"]),
         assigned_staff_id=assigned_staff,
-        status=request.form["status"]
+        status=request.form["status"],
+        start_date=start_date,
+        end_date=end_date
     )
 
     db.session.add(trek)
@@ -278,10 +337,39 @@ def edit_trek(trek_id):
 
     if request.method == "GET":
         return render_template(
-        "admin/edit_trek.html",
-        trek=trek,
-        staff_members=staff_members
-    )
+            "admin/edit_trek.html",
+            trek=trek,
+            staff_members=staff_members,
+            today=date.today().isoformat()
+        )
+
+    existing_trek = Trek.query.filter(
+        db.func.lower(Trek.trek_name) ==
+        request.form["trek_name"].strip().lower(),
+        Trek.trek_id != trek.trek_id
+    ).first()
+
+    if existing_trek:
+        flash("Another trek with this name already exists.", "danger")
+        return render_template(
+            "admin/edit_trek.html",
+            trek=trek,
+            staff_members=staff_members
+        )
+
+    start_date = datetime.strptime(
+        request.form["start_date"],
+        "%Y-%m-%d"
+    ).date()
+
+    if start_date < date.today():
+        flash("Start date cannot be in the past.", "danger")
+        return render_template(
+            "admin/edit_trek.html",
+            trek=trek,
+            staff_members=staff_members,
+            today=date.today().isoformat()
+        )
 
     assigned_staff = request.form["assigned_staff"]
 
@@ -297,7 +385,12 @@ def edit_trek(trek_id):
     trek.available_slots = int(request.form["available_slots"])
     trek.status = request.form["status"]
 
+    trek.start_date = start_date
+    trek.end_date = start_date + timedelta(days=trek.duration)
+
     db.session.commit()
+
+    flash("Trek updated successfully.", "success")
 
     return redirect(url_for("view_treks"))
 
@@ -310,8 +403,20 @@ def delete_trek(trek_id):
 
     trek = Trek.query.get_or_404(trek_id)
 
+    # Prevent deletion if bookings exist
+    if trek.bookings:
+        flash(
+            "Cannot delete a trek that has bookings.","danger"
+        )
+        return redirect(url_for("view_treks"))
+
     db.session.delete(trek)
     db.session.commit()
+
+    flash(
+        "Trek deleted successfully.",
+        "success"
+    )
 
     return redirect(url_for("view_treks"))
 
@@ -323,14 +428,16 @@ def view_staff():
     if current_user.role != "Admin":
         return "Access Denied."
 
-    staff = User.query.filter_by(role="Trek Staff").all()
+    staff = User.query.filter_by(
+        role="Trek Staff"
+    ).outerjoin(StaffProfile).all()
 
     return render_template(
         "admin/view_staff.html",
         staff=staff
     )
 
-#ADMIN APPROVAL TO TREK
+#ADMIN APPROVAl TO STAFF
 @app.route("/admin/staff/approve/<int:user_id>")
 @login_required
 def approve_staff(user_id):
@@ -381,6 +488,9 @@ def blacklist_staff(user_id):
 
     staff = User.query.get_or_404(user_id)
 
+    if staff.role == "Admin":
+        return "Cannot blacklist Admin."
+
     staff.is_blacklisted = True
 
     db.session.commit()
@@ -397,6 +507,9 @@ def activate_staff(user_id):
 
     staff = User.query.get_or_404(user_id)
 
+    if staff.role == "Admin":
+        return "Cannot modify Admin."
+
     staff.is_blacklisted = False
 
     db.session.commit()
@@ -411,11 +524,21 @@ def view_users():
     if current_user.role != "Admin":
         return "Access Denied."
 
-    users = User.query.filter_by(role="User").all()
+    search = request.args.get("search", "")
+
+    users = User.query.filter_by(role="User")
+
+    if search:
+        users = users.filter(
+            User.name.ilike(f"%{search}%")
+        )
+
+    users = users.all()
 
     return render_template(
         "admin/view_users.html",
-        users=users
+        users=users,
+        search=search
     )
 
 #BLACKLIST USER
@@ -470,7 +593,7 @@ def admin_search():
             User.role == "User",
             or_(
                 User.name.ilike(f"%{keyword}%"),
-                User.user_id.like(f"%{keyword}%")
+                db.cast(User.user_id, db.String).ilike(f"%{keyword}%")
             )
         ).all()
 
@@ -478,14 +601,14 @@ def admin_search():
             User.role == "Trek Staff",
             or_(
                 User.name.ilike(f"%{keyword}%"),
-                User.user_id.like(f"%{keyword}%")
+                db.cast(User.user_id, db.String).ilike(f"%{keyword}%")
             )
         ).all()
 
         treks = Trek.query.filter(
             or_(
                 Trek.trek_name.ilike(f"%{keyword}%"),
-                Trek.trek_id.like(f"%{keyword}%")
+                db.cast(Trek.trek_id, db.String).ilike(f"%{keyword}%")
             )
         ).all()
 
@@ -493,7 +616,8 @@ def admin_search():
         "admin/search.html",
         users=users,
         staff=staff,
-        treks=treks
+        treks=treks,
+        keyword=request.form.get("keyword", "")
     )
 
 @app.route("/staff/trek/<int:trek_id>", methods=["GET", "POST"])
@@ -508,18 +632,41 @@ def staff_trek(trek_id):
     if trek.assigned_staff_id != current_user.user_id:
         return "Access Denied."
 
+    bookings = Booking.query.filter_by(
+        trek_id=trek.trek_id
+    ).all()
+
+    total_slots = trek.available_slots + len([
+        b for b in bookings
+        if b.booking_status == "Booked"
+    ])
+
     if request.method == "POST":
 
+        action = request.form["action"]
+
+        if action == "started":
+            trek.status = "Started"
+
+        elif action == "completed":
+
+            trek.status = "Completed"
+
+            for booking in bookings:
+                if booking.booking_status == "Booked":
+                    booking.booking_status = "Completed"
+
         trek.available_slots = int(request.form["available_slots"])
-        trek.status = request.form["status"]
 
         db.session.commit()
 
-        return redirect(url_for("staff_dashboard"))
+        return redirect(url_for("staff_trek", trek_id=trek.trek_id))
 
     return render_template(
         "staff/trek.html",
-        trek=trek
+        trek=trek,
+        bookings=bookings,
+        total_slots=total_slots
     )
 
 @app.route("/staff/profile", methods=["GET", "POST"])
@@ -638,6 +785,7 @@ def book_trek(trek_id):
     booking = Booking(
         user_id=current_user.user_id,
         trek_id=trek.trek_id,
+        booking_date=date.today(),
         booking_status="Booked"
     )
 
@@ -657,21 +805,67 @@ def user_bookings():
 
     bookings = Booking.query.filter_by(
         user_id=current_user.user_id
+    ).order_by(
+        Booking.booking_date.desc()
     ).all()
-
-    history = []
-
-    current_bookings = []
-
-    for booking in bookings:
-
-        if booking.trek.status == "Completed":
-            history.append(booking)
-        else:
-            current_bookings.append(booking)
 
     return render_template(
         "user/bookings.html",
-        bookings=current_bookings,
-        history=history
+        bookings=bookings
+    )
+
+@app.route("/user/cancel/<int:booking_id>")
+@login_required
+def cancel_booking(booking_id):
+
+    if current_user.role != "User":
+        return "Access Denied."
+
+    booking = Booking.query.get_or_404(booking_id)
+
+    if booking.user_id != current_user.user_id:
+        return "Access Denied."
+
+    if booking.booking_status != "Booked":
+        return redirect(url_for("user_bookings"))
+
+    booking.booking_status = "Cancelled"
+
+    booking.trek.available_slots += 1
+
+    db.session.commit()
+
+    return redirect(url_for("user_bookings"))
+
+@app.route("/admin/bookings")
+@login_required
+def admin_bookings():
+
+    if current_user.role != "Admin":
+        return "Access Denied."
+
+    search = request.args.get("search", "")
+
+    bookings = Booking.query
+
+    if search:
+
+        bookings = bookings.filter(
+            db.or_(
+                Booking.booking_status.ilike(f"%{search}%"),
+                Booking.user.has(
+                    User.name.ilike(f"%{search}%")
+                ),
+                Booking.trek.has(
+                    Trek.trek_name.ilike(f"%{search}%")
+                )
+            )
+        )
+
+    bookings = bookings.all()
+
+    return render_template(
+        "admin/bookings.html",
+        bookings=bookings,
+        search=search
     )

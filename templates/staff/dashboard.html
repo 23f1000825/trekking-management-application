@@ -1,111 +1,164 @@
-<!DOCTYPE html>
-<html>
+{% extends "base_dashboard.html" %}
 
-<head>
+{% block title %}
+Staff Dashboard
+{% endblock %}
 
-<title>Staff Dashboard</title>
+{% block panel_title %}
+Staff Panel
+{% endblock %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block sidebar %}
 
-</head>
+<div class="list-group list-group-flush">
 
-<body>
+    <a href="{{ url_for('staff_dashboard') }}"
+       class="list-group-item list-group-item-action active">
+        Dashboard
+    </a>
 
-<div class="container mt-5">
+    <a href="{{ url_for('staff_profile') }}"
+       class="list-group-item list-group-item-action">
+        Profile
+    </a>
 
-<h2>Welcome {{ current_user.name }}</h2>
+    <a href="{{ url_for('logout') }}"
+       class="list-group-item list-group-item-action text-danger">
+        Logout
+    </a>
 
-<hr>
+</div>
 
-<div class="card mb-4">
+{% endblock %}
 
-<div class="card-body">
+{% block content %}
 
-<h4>
-
-Assigned Treks
-
-</h4>
-
-<h2>
-
-{{ total_treks }}
-
+<h2 class="mb-4">
+    My Dashboard
 </h2>
 
-</div>
+<div class="row mb-4">
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Assigned Treks</h6>
+                <h2>{{ total_treks }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Total Participants</h6>
+                <h2>{{ total_participants }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Open Treks</h6>
+                <h2>{{ open_treks }}</h2>
+            </div>
+        </div>
+    </div>
 
 </div>
 
-<table class="table table-bordered">
+<h4 class="mb-3">
+    My Assigned Treks
+</h4>
 
-<tr>
+<div class="table-responsive">
 
-<th>ID</th>
-<th>Trek</th>
-<th>Location</th>
-<th>Status</th>
-<th>Slots</th>
-<th>Action</th>
-<th>Participants</th>
+<table class="table table-bordered table-hover align-middle">
 
-</tr>
+    <thead class="table-light">
 
-{% for item in trek_data %}
-{% set trek = item.trek %}
+        <tr>
 
-<tr>
+            <th>Trek Name</th>
+            <th>Location</th>
+            <th>Participants</th>
+            <th>Slots</th>
+            <th>Status</th>
+            <th width="120">Action</th>
 
-<td>{{ trek.trek_id }}</td>
+        </tr>
 
-<td>{{ trek.trek_name }}</td>
+    </thead>
 
-<td>{{ trek.location }}</td>
+    <tbody>
 
-<td>{{ trek.status }}</td>
+    {% for item in trek_data %}
 
-<td>{{ trek.available_slots }}</td>
+        <tr>
 
-<td>{{ item.participant_count }}</td>
+            <td>{{ item.trek.trek_name }}</td>
 
-<td>
+            <td>{{ item.trek.location }}</td>
 
-<a
-href="{{ url_for('staff_trek', trek_id=trek.trek_id) }}"
-class="btn btn-primary btn-sm">
+            <td>{{ item.participant_count }}</td>
 
-    Manage
+            <td>{{ item.trek.available_slots }}</td>
 
-</a>
+            <td>
 
-<a
-href="{{ url_for('participant_list', trek_id=trek.trek_id) }}"
-class="btn btn-success btn-sm">
+                {% if item.trek.status == "Open" %}
+                    <span class="badge bg-success">Open</span>
 
-Participants
+                {% elif item.trek.status == "Started" %}
+                    <span class="badge bg-primary">Started</span>
 
-</a>
+                {% elif item.trek.status == "Ongoing" %}
+                    <span class="badge bg-warning text-dark">Ongoing</span>
 
-</td>
-</tr>
+                {% elif item.trek.status == "Completed" %}
+                    <span class="badge bg-secondary">Completed</span>
 
-{% endfor %}
+                {% else %}
+                    <span class="badge bg-danger">Closed</span>
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                <a
+                href="{{ url_for('staff_trek', trek_id=item.trek.trek_id) }}"
+                class="btn btn-outline-primary btn-sm">
+
+                    Manage
+
+                </a>
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    {% if trek_data|length == 0 %}
+
+        <tr>
+
+            <td colspan="6" class="text-center text-muted">
+
+                No treks assigned.
+
+            </td>
+
+        </tr>
+
+    {% endif %}
+
+    </tbody>
 
 </table>
 
-<a href="{{ url_for('staff_profile') }}" class="btn btn-warning">
-    Update Profile
-</a>
-
-<a
-href="{{ url_for('logout') }}"
-class="btn btn-danger">
-
-Logout
-
-</a>
 </div>
 
-</body>
-
-</html>
+{% endblock %}

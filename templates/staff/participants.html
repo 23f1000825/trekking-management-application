@@ -1,23 +1,47 @@
-<!DOCTYPE html>
-<html>
+{% extends "base_dashboard.html" %}
 
-<head>
+{% block title %}
+Participants
+{% endblock %}
 
-<title>Participants</title>
+{% block panel_title %}
+Staff Panel
+{% endblock %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block sidebar %}
 
-</head>
+<div class="list-group list-group-flush">
 
-<body>
+    <a href="{{ url_for('staff_dashboard') }}"
+       class="list-group-item list-group-item-action">
+        Dashboard
+    </a>
 
-<div class="container mt-5">
+    <a href="{{ url_for('staff_profile') }}"
+       class="list-group-item list-group-item-action">
+        Profile
+    </a>
 
-<h2>{{ trek.trek_name }}</h2>
+    <a href="{{ url_for('logout') }}"
+       class="list-group-item list-group-item-action text-danger">
+        Logout
+    </a>
 
-<hr>
+</div>
 
-<table class="table table-bordered">
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+{{ trek.trek_name }} Participants
+</h2>
+
+<div class="table-responsive">
+
+<table class="table table-bordered align-middle">
+
+<thead class="table-light">
 
 <tr>
 
@@ -26,6 +50,10 @@
 <th>Booking Status</th>
 
 </tr>
+
+</thead>
+
+<tbody>
 
 {% for booking in bookings %}
 
@@ -41,28 +69,25 @@
 
 {% endfor %}
 
+</tbody>
+
 </table>
+
+</div>
 
 {% if bookings|length == 0 %}
 
 <div class="alert alert-info">
-
 No participants yet.
-
 </div>
 
 {% endif %}
 
-<a
-href="{{ url_for('staff_dashboard') }}"
+<a href="{{ url_for('staff_dashboard') }}"
 class="btn btn-secondary">
 
 Back
 
 </a>
 
-</div>
-
-</body>
-
-</html>
+{% endblock %}

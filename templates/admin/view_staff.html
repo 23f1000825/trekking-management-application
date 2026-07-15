@@ -1,83 +1,259 @@
-<!DOCTYPE html>
-<html>
+{% extends "base_dashboard.html" %}
 
-<head>
+{% block title %}
+Manage Staff
+{% endblock %}
 
-    <title>Manage Staff</title>
+{% block sidebar %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<div class="list-group list-group-flush">
 
-</head>
+    <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action">
+        Dashboard
+    </a>
 
-<body>
+    <a href="{{ url_for('view_treks') }}" class="list-group-item list-group-item-action">
+        Treks
+    </a>
 
-<div class="container mt-5">
+    <a href="{{ url_for('view_staff') }}" class="list-group-item list-group-item-action active">
+        Staff
+    </a>
 
-<h2>Manage Trek Staff</h2>
+    <a href="{{ url_for('view_users') }}" class="list-group-item list-group-item-action">
+        Users
+    </a>
 
-<table class="table table-bordered">
+    <a href="{{ url_for('admin_bookings') }}" class="list-group-item list-group-item-action">
+        Bookings
+    </a>
 
-<tr>
+    <a href="{{ url_for('admin_search') }}" class="list-group-item list-group-item-action">
+        Search
+    </a>
 
-<th>ID</th>
-<th>Name</th>
-<th>Email</th>
-<th>Approved</th>
-<th>Blacklisted</th>
-<th>Actions</th>
+    <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action text-danger">
+        Logout
+    </a>
 
-</tr>
+</div>
 
-{% for member in staff %}
+{% endblock %}
 
-<tr>
+{% block content %}
 
-<td>{{ member.user_id }}</td>
-<td>{{ member.name }}</td>
-<td>{{ member.email }}</td>
-<td>{{ member.is_approved }}</td>
-<td>{{ member.is_blacklisted }}</td>
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-<td>
+    <h2 class="mb-0">
+        Trek Staff
+    </h2>
 
-<a href="{{ url_for('approve_staff', user_id=member.user_id) }}"
-class="btn btn-success btn-sm">
+</div>
 
-Approve
+<div class="row mb-4">
 
-</a>
+    <div class="col-md-4">
 
-<a href="{{ url_for('blacklist_staff', user_id=member.user_id) }}"
-class="btn btn-danger btn-sm">
+        <div class="card text-center">
 
-Blacklist
+            <div class="card-body">
 
-</a>
+                <h6>Pending</h6>
 
-<a href="{{ url_for('activate_staff', user_id=member.user_id) }}"
-class="btn btn-primary btn-sm">
+                <h3>
+                    {{ staff|selectattr('is_approved','equalto',False)|list|length }}
+                </h3>
 
-Activate
+            </div>
 
-</a>
+        </div>
 
-<a href="{{ url_for('delete_staff', user_id=member.user_id) }}"
-class="btn btn-dark btn-sm">
+    </div>
 
-    Delete
+    <div class="col-md-4">
 
-</a>
+        <div class="card text-center">
 
-</td>
+            <div class="card-body">
 
-</tr>
+                <h6>Approved</h6>
 
-{% endfor %}
+                <h3>
+                    {{ staff|selectattr('is_approved','equalto',True)|rejectattr('is_blacklisted')|list|length }}
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card text-center">
+
+            <div class="card-body">
+
+                <h6>Blacklisted</h6>
+
+                <h3>
+                    {{ staff|selectattr('is_blacklisted')|list|length }}
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<form method="GET" class="mb-4">
+
+    <input
+        type="text"
+        class="form-control"
+        placeholder="Search staff..."
+        disabled
+    >
+
+</form>
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover align-middle">
+
+    <thead class="table-light">
+
+        <tr>
+
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th width="280">Actions</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% if staff %}
+
+        {% for member in staff %}
+
+        <tr>
+
+            <td>{{ member.user_id }}</td>
+
+            <td>{{ member.name }}</td>
+
+            <td>{{ member.email }}</td>
+
+            <td>
+
+                {% if member.staff_profile %}
+
+                    {{ member.staff_profile.contact_number }}
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if member.is_blacklisted %}
+
+                    <span class="badge bg-danger">
+                        Blacklisted
+                    </span>
+
+                {% elif member.is_approved %}
+
+                    <span class="badge bg-success">
+                        Approved
+                    </span>
+
+                {% else %}
+
+                    <span class="badge bg-warning text-dark">
+                        Pending
+                    </span>
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if not member.is_approved %}
+
+                    <a
+                        href="{{ url_for('approve_staff', user_id=member.user_id) }}"
+                        class="btn btn-success btn-sm me-1"
+                    >
+                        Approve
+                    </a>
+
+                {% endif %}
+
+                {% if member.is_blacklisted %}
+
+                    <a
+                        href="{{ url_for('activate_staff', user_id=member.user_id) }}"
+                        class="btn btn-primary btn-sm me-1"
+                    >
+                        Activate
+                    </a>
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for('blacklist_staff', user_id=member.user_id) }}"
+                        class="btn btn-danger btn-sm me-1"
+                    >
+                        Blacklist
+                    </a>
+
+                {% endif %}
+
+                <a
+                    href="{{ url_for('delete_staff', user_id=member.user_id) }}"
+                    class="btn btn-dark btn-sm"
+                >
+                    Delete
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <tr>
+
+            <td colspan="6" class="text-center">
+
+                No trek staff found.
+
+            </td>
+
+        </tr>
+
+    {% endif %}
+
+    </tbody>
 
 </table>
 
 </div>
 
-</body>
-
-</html>
+{% endblock %}
