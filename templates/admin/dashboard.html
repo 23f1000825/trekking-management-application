@@ -78,6 +78,7 @@ Admin Dashboard
 
                 <h6 class="text-muted">
                     Total Users
+                
                 </h6>
 
                 <h2>
@@ -94,6 +95,7 @@ Admin Dashboard
 
                 <h6 class="text-muted">
                     Total Staff
+        
                 </h6>
 
                 <h2>
@@ -114,6 +116,7 @@ Admin Dashboard
 
                 <h2>
                     {{ total_bookings }}
+                   
                 </h2>
 
             </div>
@@ -121,5 +124,323 @@ Admin Dashboard
     </div>
 
 </div>
+
+<hr class="my-4">
+
+<div class="row">
+
+    <div class="col-lg-6 mb-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body" style="height:360px; padding:20px;">
+
+                <h5 class="text-center mb-3">
+                    Treks by Status
+                </h5>
+
+                <canvas id="trekChart" height="220"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-6 mb-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body" style="height:320px; padding:20px;"">
+
+                <h5 class="text-center mb-3">
+                    Bookings by Status
+                </h5>
+
+                <canvas id="bookingChart" height="220"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-lg-8 mx-auto">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body" style="height:260px;">
+
+                <h5 class="text-center mb-3">
+                    Users by Role
+                </h5>
+
+                <canvas id="userChart" height="180"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const trekData = {{ trek_chart | tojson | safe }};
+const bookingData = {{ booking_chart | tojson | safe }};
+const userData = {{ user_chart | tojson | safe }};
+
+// ================= TREK STATUS =================
+
+new Chart(document.getElementById("trekChart"), {
+
+    type: "doughnut",
+
+    data: {
+
+        labels: ["Open", "Closed", "Ongoing", "Completed"],
+
+        datasets: [{
+
+            data: trekData,
+
+            backgroundColor: [
+                "#198754",
+                "#dc3545",
+                "#ffc107",
+                "#0d6efd"
+            ],
+
+            borderColor: "#ffffff",
+
+            borderWidth: 3,
+
+            hoverOffset: 10
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        cutout: "55%",
+
+        layout: {
+
+            padding: 15
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                position: "bottom",
+
+                labels: {
+
+                    boxWidth: 14,
+
+                    padding: 18
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+// ================= BOOKINGS =================
+
+new Chart(document.getElementById("bookingChart"), {
+
+    type: "bar",
+
+    data: {
+
+        labels: ["Booked", "Cancelled", "Completed"],
+
+        datasets: [{
+
+            data: bookingData,
+
+            backgroundColor: [
+                "#0d6efd",
+                "#dc3545",
+                "#198754"
+            ],
+
+            borderRadius: 8,
+
+            borderSkipped: false
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        layout: {
+
+            padding: 15
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    precision: 0,
+
+                    stepSize: 1
+
+                }
+
+            },
+
+            x: {
+
+                grid: {
+
+                    display: false
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+// ================= USERS =================
+
+new Chart(document.getElementById("userChart"), {
+
+    type: "bar",
+
+    data: {
+
+        labels: ["Trekkers", "Staff", "Admins"],
+
+        datasets: [{
+
+            data: userData,
+
+            backgroundColor: [
+                "#0d6efd",
+                "#ffc107",
+                "#6f42c1"
+            ],
+
+            borderRadius: 8,
+
+            borderSkipped: false
+
+        }]
+
+    },
+
+    options: {
+
+        indexAxis: "y",
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        layout: {
+
+            padding: 15
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    precision: 0,
+
+                    stepSize: 1
+
+                },
+
+                grid: {
+
+                    color: "#eeeeee"
+
+                }
+
+            },
+
+            y: {
+
+                grid: {
+
+                    display: false
+
+                },
+
+                ticks: {
+
+                    padding: 12
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
 
 {% endblock %}

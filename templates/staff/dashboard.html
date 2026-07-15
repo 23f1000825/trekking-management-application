@@ -161,4 +161,122 @@ Staff Panel
 
 </div>
 
+<hr class="my-4">
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <h4 class="text-center mb-4">
+            Participants per Trek
+        </h4>
+
+        <div style="height:350px;">
+
+            <canvas id="participantChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const trekLabels = {{ trek_labels | tojson | safe }};
+const participantCounts = {{ participant_counts | tojson | safe }};
+
+new Chart(document.getElementById("participantChart"), {
+
+    type: "bar",
+
+    data: {
+
+        labels: trekLabels,
+
+        datasets: [{
+
+            label: "Participants",
+
+            data: participantCounts,
+
+            backgroundColor: "#0d6efd",
+            borderRadius: 8,
+            maxBarThickness: 55
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            },
+
+            title: {
+
+                display: true,
+                text: "Number of Participants in Each Assigned Trek",
+                font: {
+
+                    size: 16
+
+                }
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                title: {
+
+                    display: true,
+                    text: "Treks"
+
+                }
+
+            },
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    precision: 0,
+                    stepSize: 1
+
+                },
+
+                title: {
+
+                    display: true,
+                    text: "Participants"
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
 {% endblock %}

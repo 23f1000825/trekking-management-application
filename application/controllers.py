@@ -120,7 +120,7 @@ def logout():
 
     return redirect(url_for("login"))
 
-#ADMIN DASHBOARD
+# ADMIN DASHBOARD
 @app.route("/admin/dashboard")
 @login_required
 def admin_dashboard():
@@ -129,22 +129,54 @@ def admin_dashboard():
         return "Access Denied."
 
     total_treks = Trek.query.count()
-
     total_users = User.query.filter_by(role="User").count()
-
     total_staff = User.query.filter_by(role="Trek Staff").count()
-
     total_bookings = Booking.query.count()
+
+    # -------- Trek Status Chart --------
+
+    open_treks = Trek.query.filter_by(status="Open").count()
+    closed_treks = Trek.query.filter_by(status="Closed").count()
+    ongoing_treks = Trek.query.filter_by(status="Ongoing").count()
+    completed_treks = Trek.query.filter_by(status="Completed").count()
+
+    # -------- Booking Status Chart --------
+
+    booked = Booking.query.filter_by(booking_status="Booked").count()
+    cancelled = Booking.query.filter_by(booking_status="Cancelled").count()
+    completed_booking = Booking.query.filter_by(
+        booking_status="Completed"
+    ).count()
 
     return render_template(
         "admin/dashboard.html",
+
         total_treks=total_treks,
         total_users=total_users,
         total_staff=total_staff,
-        total_bookings=total_bookings
+        total_bookings=total_bookings,
+
+        trek_chart=[
+            open_treks,
+            closed_treks,
+            ongoing_treks,
+            completed_treks
+        ],
+
+        booking_chart=[
+            booked,
+            cancelled,
+            completed_booking
+        ],
+
+        user_chart=[
+            total_users,
+            total_staff,
+            1      # one predefined admin
+        ]
     )
 
-#STAFF DASHBOARD
+# STAFF DASHBOARD
 @app.route("/staff/dashboard")
 @login_required
 def staff_dashboard():
@@ -159,8 +191,11 @@ def staff_dashboard():
     trek_data = []
 
     total_participants = 0
-
     open_treks = 0
+
+    # Data for Chart.js
+    trek_labels = []
+    participant_counts = []
 
     for trek in treks:
 
@@ -179,12 +214,18 @@ def staff_dashboard():
             "participant_count": participant_count
         })
 
+        # Chart data
+        trek_labels.append(trek.trek_name)
+        participant_counts.append(participant_count)
+
     return render_template(
         "staff/dashboard.html",
         trek_data=trek_data,
         total_treks=len(treks),
         total_participants=total_participants,
-        open_treks=open_treks
+        open_treks=open_treks,
+        trek_labels=trek_labels,
+        participant_counts=participant_counts
     )
 
 
@@ -832,9 +873,25 @@ def user_history():
         Booking.booking_status.in_(["Completed", "Cancelled"])
     ).all()
 
+    completed = Booking.query.filter_by(
+        user_id=current_user.user_id,
+        booking_status="Completed"
+    ).count()
+
+    cancelled = Booking.query.filter_by(
+        user_id=current_user.user_id,
+        booking_status="Cancelled"
+    ).count()
+
+    history_chart = [
+        completed,
+        cancelled
+    ]
+
     return render_template(
         "user/history.html",
-        history=history
+        history=history,
+        history_chart=history_chart
     )
 
 @app.route("/user/cancel/<int:booking_id>")
