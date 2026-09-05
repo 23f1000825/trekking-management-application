@@ -1,4 +1,4 @@
-# 🥾 Trek Management System
+# Trek Management System
 
 A role-based Trek Management System developed using **Flask**, **SQLAlchemy**, **SQLite**, **Bootstrap 5**, and **Chart.js**. The application allows administrators to manage treks and staff, trekkers to book and manage treks, and trek staff to oversee assigned treks.
 
