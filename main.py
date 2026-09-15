@@ -44,13 +44,13 @@ def load_user(user_id):
 from application.controllers import *
 
 with app.app_context():
-    db.create_all()
     try:
+        db.create_all()
         if User.query.count() == 0:
             from initial_data import seed
-            seed()
+            seed(app)
     except Exception as e:
-        print("Seeding exception:", e)
+        print("Database init exception:", e)
 
 
 if __name__ == "__main__":
