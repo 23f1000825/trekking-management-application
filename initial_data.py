@@ -1,11 +1,16 @@
-from main import app
+from flask import current_app
 from application.database import db
 from application.models import User, Trek, Booking, StaffProfile
 from datetime import date, datetime, timedelta
 
 
-def seed():
-    with app.app_context():
+def seed(app_instance=None):
+    if app_instance:
+        ctx = app_instance.app_context()
+    else:
+        ctx = current_app.app_context()
+
+    with ctx:
 
         db.create_all()
 
@@ -289,4 +294,5 @@ def seed():
 
 
 if __name__ == "__main__":
-    seed()
+    from main import app
+    seed(app)
