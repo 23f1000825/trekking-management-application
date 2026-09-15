@@ -1,0 +1,167 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Search{% endblock %}
+{% block panel_title %}Admin Panel{% endblock %}
+
+{% block sidebar %}
+<a href="{{ url_for('admin_dashboard') }}" class="nav-item">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('view_treks') }}" class="nav-item">
+    <i class="bi bi-map"></i> Treks
+</a>
+<a href="{{ url_for('view_staff') }}" class="nav-item">
+    <i class="bi bi-people"></i> Staff
+</a>
+<a href="{{ url_for('view_users') }}" class="nav-item">
+    <i class="bi bi-person-lines-fill"></i> Users
+</a>
+<a href="{{ url_for('admin_bookings') }}" class="nav-item">
+    <i class="bi bi-calendar-check"></i> Bookings
+</a>
+<a href="{{ url_for('admin_search') }}" class="nav-item active">
+    <i class="bi bi-search"></i> Search
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="bi bi-search me-2" style="font-size:1.3rem;color:var(--clr-accent);"></i>Global Search</h2>
+</div>
+
+<!-- Search Box -->
+<form method="POST" class="mb-5">
+    <div style="display:flex; gap:.6rem; max-width:560px;">
+        <div class="search-bar" style="flex:1; padding:.6rem 1rem;">
+            <i class="bi bi-search"></i>
+            <input
+                type="text"
+                name="keyword"
+                placeholder="Search by name or ID…"
+                value="{{ keyword }}"
+                id="global-search-input"
+                required
+            >
+        </div>
+        <button type="submit" class="btn-tm-primary" style="padding:.6rem 1.4rem;">
+            Search
+        </button>
+    </div>
+</form>
+
+<!-- Users Results -->
+{% if users %}
+<div class="tm-card mb-4">
+    <div class="tm-card-header">
+        <i class="bi bi-person-lines-fill"></i> Users
+        <span class="badge-pill booked ms-2" style="font-size:.68rem;">{{ users|length }}</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="tm-table">
+            <thead>
+                <tr><th>#</th><th>Name</th><th>Email</th></tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td style="color:#9ab5ae;font-size:.8rem;">{{ user.user_id }}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.5rem;">
+                            <div class="avatar-init" style="width:26px;height:26px;font-size:.65rem;background:linear-gradient(135deg,#2563eb,#1d4ed8);">{{ user.name[:1].upper() }}</div>
+                            {{ user.name }}
+                        </div>
+                    </td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Staff Results -->
+{% if staff %}
+<div class="tm-card mb-4">
+    <div class="tm-card-header">
+        <i class="bi bi-people-fill"></i> Trek Staff
+        <span class="badge-pill ongoing ms-2" style="font-size:.68rem;">{{ staff|length }}</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="tm-table">
+            <thead>
+                <tr><th>#</th><th>Name</th><th>Email</th></tr>
+            </thead>
+            <tbody>
+                {% for member in staff %}
+                <tr>
+                    <td style="color:#9ab5ae;font-size:.8rem;">{{ member.user_id }}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.5rem;">
+                            <div class="avatar-init" style="width:26px;height:26px;font-size:.65rem;">{{ member.name[:1].upper() }}</div>
+                            {{ member.name }}
+                        </div>
+                    </td>
+                    <td>{{ member.email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Trek Results -->
+{% if treks %}
+<div class="tm-card mb-4">
+    <div class="tm-card-header">
+        <i class="bi bi-map-fill"></i> Treks
+        <span class="badge-pill open ms-2" style="font-size:.68rem;">{{ treks|length }}</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="tm-table">
+            <thead>
+                <tr><th>#</th><th>Name</th><th>Location</th><th>Difficulty</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for trek in treks %}
+                <tr>
+                    <td style="color:#9ab5ae;font-size:.8rem;">{{ trek.trek_id }}</td>
+                    <td style="font-weight:600;">{{ trek.trek_name }}</td>
+                    <td>{{ trek.location }}</td>
+                    <td>
+                        {% if trek.difficulty == "Easy" %}<span class="badge-pill easy">Easy</span>
+                        {% elif trek.difficulty == "Moderate" %}<span class="badge-pill moderate">Moderate</span>
+                        {% else %}<span class="badge-pill hard">Hard</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if trek.status == "Open" %}<span class="badge-pill open">Open</span>
+                        {% elif trek.status == "Completed" %}<span class="badge-pill completed">Completed</span>
+                        {% elif trek.status == "Ongoing" %}<span class="badge-pill ongoing">Ongoing</span>
+                        {% else %}<span class="badge-pill closed">{{ trek.status }}</span>{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if not users and not staff and not treks and keyword %}
+<div class="tm-card">
+    <div class="tm-card-body">
+        <div class="empty-state">
+            <i class="bi bi-search"></i>
+            <p>No results found for "<strong>{{ keyword }}</strong>"</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

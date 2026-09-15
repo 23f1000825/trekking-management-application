@@ -1,0 +1,171 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Manage Treks{% endblock %}
+{% block panel_title %}Admin Panel{% endblock %}
+
+{% block sidebar %}
+<a href="{{ url_for('admin_dashboard') }}" class="nav-item">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('view_treks') }}" class="nav-item active">
+    <i class="bi bi-map"></i> Treks
+</a>
+<a href="{{ url_for('view_staff') }}" class="nav-item">
+    <i class="bi bi-people"></i> Staff
+</a>
+<a href="{{ url_for('view_users') }}" class="nav-item">
+    <i class="bi bi-person-lines-fill"></i> Users
+</a>
+<a href="{{ url_for('admin_bookings') }}" class="nav-item">
+    <i class="bi bi-calendar-check"></i> Bookings
+</a>
+<a href="{{ url_for('admin_search') }}" class="nav-item">
+    <i class="bi bi-search"></i> Search
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="bi bi-map me-2" style="font-size:1.3rem; color:var(--clr-accent);"></i>Treks</h2>
+    <a href="{{ url_for('add_trek') }}" class="btn-tm-primary">
+        <i class="bi bi-plus-lg"></i> Add New Trek
+    </a>
+</div>
+
+<!-- Search Bar -->
+<form method="GET" class="mb-4" style="max-width: 420px;">
+    <div class="search-bar">
+        <i class="bi bi-search"></i>
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Search treks by name…"
+            id="trek-search-input"
+        >
+    </div>
+</form>
+
+<!-- Table -->
+<div class="tm-card">
+    <div class="tm-card-header">
+        <i class="bi bi-table"></i>
+        All Treks
+        <span class="ms-auto text-muted-sm">{{ treks|length }} total</span>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="tm-table" id="treks-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Trek Name</th>
+                    <th>Location</th>
+                    <th>Difficulty</th>
+                    <th>Duration</th>
+                    <th>Slots</th>
+                    <th>Status</th>
+                    <th>Assigned Staff</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if treks %}
+                {% for trek in treks %}
+                <tr>
+                    <td style="color:#9ab5ae; font-size:.8rem;">{{ trek.trek_id }}</td>
+
+                    <td style="font-weight:600; color:#111c19;">{{ trek.trek_name }}</td>
+
+                    <td>
+                        <span style="display:flex; align-items:center; gap:.3rem; color:#5a8a7a;">
+                            <i class="bi bi-geo-alt" style="font-size:.8rem;"></i>
+                            {{ trek.location }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if trek.difficulty == "Easy" %}
+                            <span class="badge-pill easy"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i>Easy</span>
+                        {% elif trek.difficulty == "Moderate" %}
+                            <span class="badge-pill moderate"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i>Moderate</span>
+                        {% else %}
+                            <span class="badge-pill hard"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i>Hard</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <span style="display:flex; align-items:center; gap:.3rem;">
+                            <i class="bi bi-clock" style="font-size:.8rem; color:#7aab9a;"></i>
+                            {{ trek.duration }}d
+                        </span>
+                    </td>
+
+                    <td>
+                        <span style="font-weight:600; color:{% if trek.available_slots <= 2 %}#dc2626{% else %}var(--clr-accent){% endif %};">
+                            {{ trek.available_slots }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if trek.status == "Open" %}
+                            <span class="badge-pill open">Open</span>
+                        {% elif trek.status == "Closed" %}
+                            <span class="badge-pill closed">Closed</span>
+                        {% elif trek.status == "Ongoing" %}
+                            <span class="badge-pill ongoing">Ongoing</span>
+                        {% elif trek.status == "Completed" %}
+                            <span class="badge-pill completed">Completed</span>
+                        {% elif trek.status == "Started" %}
+                            <span class="badge-pill started">Started</span>
+                        {% else %}
+                            <span class="badge-pill">{{ trek.status }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if trek.assigned_staff %}
+                            <div style="display:flex; align-items:center; gap:.5rem;">
+                                <div class="avatar-init" style="width:26px;height:26px;font-size:.65rem;">
+                                    {{ trek.assigned_staff.name[:1].upper() }}
+                                </div>
+                                <span>{{ trek.assigned_staff.name }}</span>
+                            </div>
+                        {% else %}
+                            <span class="text-muted-sm"><i class="bi bi-dash"></i> Not assigned</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div style="display:flex; gap:.4rem;">
+                            <a href="{{ url_for('edit_trek', trek_id=trek.trek_id) }}" class="btn-tm-warning btn-sm-icon">
+                                <i class="bi bi-pencil-fill"></i> Edit
+                            </a>
+                            <a href="{{ url_for('delete_trek', trek_id=trek.trek_id) }}" class="btn-tm-danger btn-sm-icon"
+                               onclick="return confirm('Delete this trek?')">
+                                <i class="bi bi-trash-fill"></i> Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="9">
+                        <div class="empty-state">
+                            <i class="bi bi-map"></i>
+                            <p>No treks found{% if search %} matching "{{ search }}"{% endif %}.</p>
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

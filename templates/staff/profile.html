@@ -1,0 +1,90 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}My Profile{% endblock %}
+{% block panel_title %}Staff Panel{% endblock %}
+
+{% block sidebar %}
+<a href="{{ url_for('staff_dashboard') }}" class="nav-item">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('staff_profile') }}" class="nav-item active">
+    <i class="bi bi-person-circle"></i> My Profile
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="bi bi-person-circle me-2" style="font-size:1.3rem;color:var(--clr-accent);"></i>My Profile</h2>
+</div>
+
+<!-- Profile Header Card -->
+<div class="tm-card mb-4">
+    <div class="tm-card-body" style="display:flex; align-items:center; gap:1.5rem; padding:1.8rem;">
+        <div class="avatar-init" style="width:64px;height:64px;font-size:1.4rem;font-weight:700;">
+            {{ current_user.name[:1].upper() }}
+        </div>
+        <div>
+            <h3 style="margin:0; font-family:var(--font-heading); font-size:1.4rem;">{{ current_user.name }}</h3>
+            <p class="text-muted-sm" style="margin:.2rem 0 0;">{{ current_user.email }}</p>
+            <span class="badge-pill open" style="margin-top:.5rem; display:inline-flex;">
+                <i class="bi bi-patch-check"></i> Trek Staff
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Form -->
+<div class="form-section">
+    <h2>Update Details</h2>
+    <p class="form-subtitle">Keep your contact information up to date.</p>
+
+    <form method="POST" id="staff-profile-form">
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label-tm" for="contact_number">Contact Number</label>
+                <div class="search-bar" style="padding:.55rem .85rem;">
+                    <i class="bi bi-telephone"></i>
+                    <input
+                        type="text"
+                        id="contact_number"
+                        name="contact_number"
+                        value="{{ profile.contact_number or '' }}"
+                        placeholder="+1 555 000 0000"
+                        required
+                    >
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label-tm" for="experience">Experience (Years)</label>
+                <input
+                    type="number"
+                    id="experience"
+                    name="experience"
+                    class="form-control-tm"
+                    value="{{ profile.experience or '' }}"
+                    min="0"
+                    placeholder="e.g. 5"
+                    required
+                >
+            </div>
+        </div>
+
+        <div style="display:flex; gap:.75rem;">
+            <button type="submit" class="btn-tm-primary">
+                <i class="bi bi-save-fill"></i> Save Changes
+            </button>
+            <a href="{{ url_for('staff_dashboard') }}" class="btn-tm-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

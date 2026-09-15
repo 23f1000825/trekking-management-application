@@ -1,0 +1,128 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Trekking History{% endblock %}
+{% block panel_title %}Trekker Panel{% endblock %}
+
+{% block sidebar %}
+<a href="{{ url_for('user_dashboard') }}" class="nav-item">
+    <i class="bi bi-house-fill"></i> Dashboard
+</a>
+<a href="{{ url_for('user_bookings') }}" class="nav-item">
+    <i class="bi bi-calendar-check-fill"></i> My Bookings
+</a>
+<a href="{{ url_for('user_history') }}" class="nav-item active">
+    <i class="bi bi-clock-history"></i> History
+</a>
+<a href="{{ url_for('user_profile') }}" class="nav-item">
+    <i class="bi bi-person-circle"></i> Profile
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="bi bi-clock-history me-2" style="font-size:1.3rem;color:var(--clr-accent);"></i>Trekking History</h2>
+</div>
+
+<div class="tm-card mb-4">
+    <div class="tm-card-header">
+        <i class="bi bi-table"></i> Past Treks
+        <span class="ms-auto text-muted-sm">{{ history|length }} records</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="tm-table" id="history-table">
+            <thead>
+                <tr>
+                    <th>Trek</th>
+                    <th>Booking Date</th>
+                    <th>Trek Dates</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for booking in history %}
+            <tr>
+                <td style="font-weight:600;">{{ booking.trek.trek_name }}</td>
+
+                <td style="font-size:.82rem;color:#5a8a7a;">
+                    {% if booking.booking_date %}
+                        <i class="bi bi-calendar3 me-1"></i>{{ booking.booking_date.strftime("%d %b %Y") }}
+                    {% else %}—{% endif %}
+                </td>
+
+                <td style="font-size:.82rem;color:#5a8a7a;">
+                    {% if booking.trek.start_date and booking.trek.end_date %}
+                        {{ booking.trek.start_date.strftime("%d %b %Y") }} –
+                        {{ booking.trek.end_date.strftime("%d %b %Y") }}
+                    {% else %}—{% endif %}
+                </td>
+
+                <td>
+                    {% if booking.booking_status == "Completed" %}<span class="badge-pill completed">Completed</span>
+                    {% elif booking.booking_status == "Cancelled" %}<span class="badge-pill cancelled">Cancelled</span>
+                    {% else %}<span class="badge-pill">{{ booking.booking_status }}</span>{% endif %}
+                </td>
+
+                <td>
+                    <a href="{{ url_for('trek_details', trek_id=booking.trek.trek_id) }}" class="btn-tm-secondary btn-sm-icon">
+                        <i class="bi bi-eye"></i> View
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">
+                    <div class="empty-state">
+                        <i class="bi bi-clock-history"></i>
+                        <p>No trekking history yet. Go book an adventure!</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- History Chart -->
+{% if history %}
+<div class="chart-card">
+    <h5><i class="bi bi-bar-chart-fill"></i> Booking Summary</h5>
+    <div style="height:260px; position:relative;">
+        <canvas id="historyChart"></canvas>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const historyData = {{ history_chart | tojson | safe }};
+new Chart(document.getElementById("historyChart"), {
+    type: "bar",
+    data: {
+        labels: ["Completed","Cancelled"],
+        datasets: [{
+            data: historyData,
+            backgroundColor: ["#16a34a","#dc2626"],
+            borderRadius: 8, borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Inter' } }, grid: { color: "#eef1f0" } },
+            x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }
+        }
+    }
+});
+</script>
+{% endblock %}

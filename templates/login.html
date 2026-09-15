@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Trekking Management</title>
+    <meta name="description" content="Log in to the Trekking Management Application to manage or book treks.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="margin:0;">
+
+<div class="auth-page">
+
+    <!-- Left Branding Panel -->
+    <div class="auth-left">
+        <div class="auth-brand">
+            <i class="bi bi-compass-fill"></i>
+            TrekAdmin
+        </div>
+
+        <h1>Your Journey<br>Starts Here</h1>
+        <p>Manage treks, staff, and bookings from one powerful dashboard.</p>
+
+        <ul class="auth-features">
+            <li><i class="bi bi-check-circle-fill"></i> Real-time booking management</li>
+            <li><i class="bi bi-check-circle-fill"></i> Staff assignment & tracking</li>
+            <li><i class="bi bi-check-circle-fill"></i> Analytics &amp; reporting</li>
+            <li><i class="bi bi-check-circle-fill"></i> Participant oversight</li>
+        </ul>
+    </div>
+
+    <!-- Right Login Form -->
+    <div class="auth-right">
+        <div class="auth-form-wrap">
+
+            <h2>Welcome back</h2>
+            <p class="auth-sub">Enter your credentials to access your panel.</p>
+
+            <form method="POST" id="login-form">
+
+                <div class="mb-4">
+                    <label class="form-label-tm" for="email">Email address</label>
+                    <div class="search-bar" style="padding: .55rem .85rem;">
+                        <i class="bi bi-envelope"></i>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label-tm" for="password">Password</label>
+                    <div class="search-bar" style="padding: .55rem .85rem;">
+                        <i class="bi bi-lock"></i>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-tm-primary w-100" style="justify-content:center; padding:.7rem; font-size:.93rem;">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    Sign In
+                </button>
+
+            </form>
+
+            <hr class="divider" style="margin: 1.6rem 0;">
+
+            <p class="text-center text-muted-sm">
+                Don't have an account?
+                <a href="{{ url_for('register') }}" style="color: var(--clr-accent); font-weight:600; text-decoration:none;">
+                    Register here
+                </a>
+            </p>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

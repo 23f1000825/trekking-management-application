@@ -1,0 +1,112 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Add Trek{% endblock %}
+{% block panel_title %}Admin Panel{% endblock %}
+
+{% block sidebar %}
+<a href="{{ url_for('admin_dashboard') }}" class="nav-item">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('view_treks') }}" class="nav-item active">
+    <i class="bi bi-map"></i> Treks
+</a>
+<a href="{{ url_for('view_staff') }}" class="nav-item">
+    <i class="bi bi-people"></i> Staff
+</a>
+<a href="{{ url_for('view_users') }}" class="nav-item">
+    <i class="bi bi-person-lines-fill"></i> Users
+</a>
+<a href="{{ url_for('admin_bookings') }}" class="nav-item">
+    <i class="bi bi-calendar-check"></i> Bookings
+</a>
+<a href="{{ url_for('admin_search') }}" class="nav-item">
+    <i class="bi bi-search"></i> Search
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="bi bi-plus-circle me-2" style="font-size:1.3rem;color:var(--clr-accent);"></i>Add New Trek</h2>
+    <a href="{{ url_for('view_treks') }}" class="btn-tm-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Treks
+    </a>
+</div>
+
+<div class="form-section">
+    <h2>Trek Details</h2>
+    <p class="form-subtitle">Fill in the details below to create a new trek.</p>
+
+    <form method="POST" id="add-trek-form">
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label-tm" for="trek_name">Trek Name</label>
+                <input type="text" id="trek_name" name="trek_name" class="form-control-tm" placeholder="e.g. Annapurna Circuit" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label-tm" for="location">Location / Country</label>
+                <input type="text" id="location" name="location" class="form-control-tm" placeholder="e.g. Nepal" required>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label-tm" for="difficulty">Difficulty</label>
+                <select id="difficulty" name="difficulty" class="form-control-tm">
+                    <option value="Easy">Easy</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label-tm" for="duration">Duration (Days)</label>
+                <input type="number" id="duration" name="duration" class="form-control-tm" min="1" placeholder="e.g. 10" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label-tm" for="available_slots">Available Slots</label>
+                <input type="number" id="available_slots" name="available_slots" class="form-control-tm" min="1" placeholder="e.g. 20" required>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label-tm" for="start_date">Start Date</label>
+                <input type="date" id="start_date" name="start_date" class="form-control-tm" min="{{ today }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label-tm" for="status">Initial Status</label>
+                <select id="status" name="status" class="form-control-tm">
+                    <option value="Open">Open</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label-tm" for="assigned_staff">Assign Trek Staff</label>
+            <select id="assigned_staff" name="assigned_staff" class="form-control-tm">
+                <option value="">— No Staff Assigned —</option>
+                {% for staff in staff_members %}
+                <option value="{{ staff.user_id }}">{{ staff.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="display:flex; gap:.75rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn-tm-primary">
+                <i class="bi bi-plus-circle-fill"></i> Create Trek
+            </button>
+            <a href="{{ url_for('view_treks') }}" class="btn-tm-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

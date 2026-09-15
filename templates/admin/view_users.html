@@ -1,0 +1,121 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Manage Users{% endblock %}
+{% block panel_title %}Admin Panel{% endblock %}
+
+{% block sidebar %}
+<a href="{{ url_for('admin_dashboard') }}" class="nav-item">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('view_treks') }}" class="nav-item">
+    <i class="bi bi-map"></i> Treks
+</a>
+<a href="{{ url_for('view_staff') }}" class="nav-item">
+    <i class="bi bi-people"></i> Staff
+</a>
+<a href="{{ url_for('view_users') }}" class="nav-item active">
+    <i class="bi bi-person-lines-fill"></i> Users
+</a>
+<a href="{{ url_for('admin_bookings') }}" class="nav-item">
+    <i class="bi bi-calendar-check"></i> Bookings
+</a>
+<a href="{{ url_for('admin_search') }}" class="nav-item">
+    <i class="bi bi-search"></i> Search
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="bi bi-person-lines-fill me-2" style="font-size:1.3rem;color:var(--clr-accent);"></i>Manage Users</h2>
+</div>
+
+<!-- Search -->
+<form method="GET" class="mb-4" style="max-width:420px;">
+    <div class="search-bar">
+        <i class="bi bi-search"></i>
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Search by name…"
+            id="user-search-input"
+        >
+    </div>
+</form>
+
+<div class="tm-card">
+    <div class="tm-card-header">
+        <i class="bi bi-table"></i>
+        Registered Trekkers
+        <span class="ms-auto text-muted-sm">{{ users|length }} found</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="tm-table" id="users-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Account Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center; gap:.6rem;">
+                        <div class="avatar-init" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">
+                            {{ user.name[:1].upper() }}
+                        </div>
+                        <div>
+                            <div style="font-weight:600; font-size:.88rem;">{{ user.name }}</div>
+                            <div class="text-muted-sm">ID #{{ user.user_id }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.is_blacklisted %}
+                        <span class="badge-pill blacklisted"><i class="bi bi-slash-circle"></i> Blacklisted</span>
+                    {% else %}
+                        <span class="badge-pill approved"><i class="bi bi-check-circle"></i> Active</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display:flex; gap:.4rem;">
+                        {% if not user.is_blacklisted %}
+                            <a href="{{ url_for('blacklist_user', user_id=user.user_id) }}"
+                               class="btn-tm-danger btn-sm-icon"
+                               onclick="return confirm('Blacklist {{ user.name }}?')">
+                                <i class="bi bi-slash-circle"></i> Blacklist
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('activate_user', user_id=user.user_id) }}"
+                               class="btn-tm-success btn-sm-icon">
+                                <i class="bi bi-arrow-counterclockwise"></i> Activate
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">
+                    <div class="empty-state">
+                        <i class="bi bi-person"></i>
+                        <p>No users found{% if search %} matching "{{ search }}"{% endif %}.</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

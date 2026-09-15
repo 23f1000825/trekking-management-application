@@ -1,0 +1,135 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Booking Records{% endblock %}
+{% block panel_title %}Admin Panel{% endblock %}
+
+{% block sidebar %}
+<a href="{{ url_for('admin_dashboard') }}" class="nav-item">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('view_treks') }}" class="nav-item">
+    <i class="bi bi-map"></i> Treks
+</a>
+<a href="{{ url_for('view_staff') }}" class="nav-item">
+    <i class="bi bi-people"></i> Staff
+</a>
+<a href="{{ url_for('view_users') }}" class="nav-item">
+    <i class="bi bi-person-lines-fill"></i> Users
+</a>
+<a href="{{ url_for('admin_bookings') }}" class="nav-item active">
+    <i class="bi bi-calendar-check"></i> Bookings
+</a>
+<a href="{{ url_for('admin_search') }}" class="nav-item">
+    <i class="bi bi-search"></i> Search
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="bi bi-calendar-check me-2" style="font-size:1.3rem;color:var(--clr-accent);"></i>Booking Records</h2>
+</div>
+
+<!-- Search -->
+<form method="GET" class="mb-4" style="max-width:420px;">
+    <div class="search-bar">
+        <i class="bi bi-search"></i>
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Search bookings…"
+            id="booking-search-input"
+        >
+    </div>
+</form>
+
+<div class="tm-card">
+    <div class="tm-card-header">
+        <i class="bi bi-table"></i>
+        All Bookings
+        <span class="ms-auto text-muted-sm">{{ bookings|length }} records</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="tm-table" id="bookings-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Trek</th>
+                    <th>Booking Status</th>
+                    <th>Trek Status</th>
+                    <th>Booking Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if bookings %}
+                {% for booking in bookings %}
+                <tr>
+                    <td style="color:#9ab5ae; font-size:.8rem;">{{ booking.booking_id }}</td>
+
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.5rem;">
+                            <div class="avatar-init" style="width:26px;height:26px;font-size:.65rem;">
+                                {{ booking.user.name[:1].upper() }}
+                            </div>
+                            {{ booking.user.name }}
+                        </div>
+                    </td>
+
+                    <td style="font-weight:500;">{{ booking.trek.trek_name }}</td>
+
+                    <td>
+                        {% if booking.booking_status == "Booked" %}
+                            <span class="badge-pill booked"><i class="bi bi-check2"></i> Booked</span>
+                        {% elif booking.booking_status == "Cancelled" %}
+                            <span class="badge-pill cancelled"><i class="bi bi-x"></i> Cancelled</span>
+                        {% elif booking.booking_status == "Completed" %}
+                            <span class="badge-pill completed"><i class="bi bi-check2-all"></i> Completed</span>
+                        {% else %}
+                            <span class="badge-pill">{{ booking.booking_status }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if booking.trek.status == "Open" %}
+                            <span class="badge-pill open">Open</span>
+                        {% elif booking.trek.status == "Completed" %}
+                            <span class="badge-pill completed">Completed</span>
+                        {% elif booking.trek.status == "Ongoing" %}
+                            <span class="badge-pill ongoing">Ongoing</span>
+                        {% else %}
+                            <span class="badge-pill closed">{{ booking.trek.status }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td style="font-size:.82rem; color:#5a8a7a;">
+                        {% if booking.booking_date %}
+                            <i class="bi bi-calendar3 me-1"></i>
+                            {{ booking.booking_date.strftime('%d %b %Y') }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="bi bi-calendar-x"></i>
+                            <p>No booking records found.</p>
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block panel_title %}Admin Panel{% endblock %}
+
+{% block sidebar %}
+<a href="{{ url_for('admin_dashboard') }}" class="nav-item active">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('view_treks') }}" class="nav-item">
+    <i class="bi bi-map"></i> Treks
+</a>
+<a href="{{ url_for('view_staff') }}" class="nav-item">
+    <i class="bi bi-people"></i> Staff
+</a>
+<a href="{{ url_for('view_users') }}" class="nav-item">
+    <i class="bi bi-person-lines-fill"></i> Users
+</a>
+<a href="{{ url_for('admin_bookings') }}" class="nav-item">
+    <i class="bi bi-calendar-check"></i> Bookings
+</a>
+<a href="{{ url_for('admin_search') }}" class="nav-item">
+    <i class="bi bi-search"></i> Search
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Dashboard Overview</h2>
+    <span class="text-muted-sm"><i class="bi bi-clock me-1"></i>Live data</span>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="bi bi-map-fill"></i></div>
+            <div>
+                <div class="stat-label">Total Treks</div>
+                <div class="stat-value">{{ total_treks }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="bi bi-person-fill"></i></div>
+            <div>
+                <div class="stat-label">Registered Users</div>
+                <div class="stat-value">{{ total_users }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card amber">
+            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+            <div>
+                <div class="stat-label">Trek Staff</div>
+                <div class="stat-value">{{ total_staff }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card purple">
+            <div class="stat-icon"><i class="bi bi-calendar-check-fill"></i></div>
+            <div>
+                <div class="stat-label">Total Bookings</div>
+                <div class="stat-value">{{ total_bookings }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="divider">
+
+<!-- Charts Row -->
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        <div class="chart-card">
+            <h5><i class="bi bi-pie-chart-fill"></i> Treks by Status</h5>
+            <div style="height:280px; position:relative;">
+                <canvas id="trekChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="chart-card">
+            <h5><i class="bi bi-bar-chart-fill"></i> Bookings by Status</h5>
+            <div style="height:280px; position:relative;">
+                <canvas id="bookingChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8 mx-auto">
+        <div class="chart-card">
+            <h5><i class="bi bi-people-fill"></i> Users by Role</h5>
+            <div style="height:220px; position:relative;">
+                <canvas id="userChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const trekData    = {{ trek_chart | tojson | safe }};
+const bookingData = {{ booking_chart | tojson | safe }};
+const userData    = {{ user_chart | tojson | safe }};
+
+// Trek Status Doughnut
+new Chart(document.getElementById("trekChart"), {
+    type: "doughnut",
+    data: {
+        labels: ["Open", "Closed", "Ongoing", "Completed"],
+        datasets: [{
+            data: trekData,
+            backgroundColor: ["#16a34a","#dc2626","#d97706","#2563eb"],
+            borderColor: "#ffffff",
+            borderWidth: 3,
+            hoverOffset: 10
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false, cutout: "58%",
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 12, padding: 16, font: { family: 'Inter', size: 12 } } } }
+    }
+});
+
+// Bookings Bar
+new Chart(document.getElementById("bookingChart"), {
+    type: "bar",
+    data: {
+        labels: ["Booked","Cancelled","Completed"],
+        datasets: [{
+            data: bookingData,
+            backgroundColor: ["#2563eb","#dc2626","#16a34a"],
+            borderRadius: 8, borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1, font: { family: 'Inter' } }, grid: { color: "#eef1f0" } },
+            x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }
+        }
+    }
+});
+
+// Users Horizontal Bar
+new Chart(document.getElementById("userChart"), {
+    type: "bar",
+    data: {
+        labels: ["Trekkers","Staff","Admins"],
+        datasets: [{
+            data: userData,
+            backgroundColor: ["#2d7a5f","#d97706","#7c3aed"],
+            borderRadius: 8, borderSkipped: false
+        }]
+    },
+    options: {
+        indexAxis: "y", responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { precision: 0, stepSize: 1, font: { family: 'Inter' } }, grid: { color: "#eef1f0" } },
+            y: { grid: { display: false }, ticks: { padding: 10, font: { family: 'Inter' } } }
+        }
+    }
+});
+</script>
+{% endblock %}

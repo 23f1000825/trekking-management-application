@@ -1,0 +1,16 @@
+# Virtual Environment
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# VS Code
+.vscode/
+
+# SQLite database (optional)
+db_directory/trekking.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
