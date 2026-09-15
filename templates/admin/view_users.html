@@ -81,9 +81,9 @@
                 <td>{{ user.email }}</td>
                 <td>
                     {% if user.is_blacklisted %}
-                        <span class="badge-pill blacklisted"><i class="bi bi-slash-circle"></i> Blacklisted</span>
+                        <span style="color:#dc2626; font-weight:600;">Blacklisted</span>
                     {% else %}
-                        <span class="badge-pill approved"><i class="bi bi-check-circle"></i> Active</span>
+                        <span style="color:#15803d; font-weight:600;">Active</span>
                     {% endif %}
                 </td>
                 <td>

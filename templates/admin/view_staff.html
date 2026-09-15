@@ -109,11 +109,11 @@
                     </td>
                     <td>
                         {% if member.is_blacklisted %}
-                            <span class="badge-pill blacklisted"><i class="bi bi-slash-circle"></i> Blacklisted</span>
+                            <span style="color:#dc2626; font-weight:600;">Blacklisted</span>
                         {% elif member.is_approved %}
-                            <span class="badge-pill approved"><i class="bi bi-patch-check"></i> Approved</span>
+                            <span style="color:#15803d; font-weight:600;">Approved</span>
                         {% else %}
-                            <span class="badge-pill pending"><i class="bi bi-hourglass"></i> Pending</span>
+                            <span style="color:#7c3aed; font-weight:600;">Pending</span>
                         {% endif %}
                     </td>
                     <td>
