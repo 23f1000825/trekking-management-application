@@ -321,18 +321,18 @@ h4, h5, h6 {
 }
 
 .tm-card .tm-card-header {
-  padding: 1.1rem 1.4rem;
-  border-bottom: 1px solid var(--clr-border);
+  padding: .8rem 1.2rem;
+  border-bottom: 1px solid #e5e5e5;
   font-weight: 600;
-  font-size: .95rem;
+  font-size: .9rem;
   display: flex;
   align-items: center;
   gap: .5rem;
-  color: #1e2d2a;
-  background: #fafcfb;
+  color: #1e1e1e;
+  background: #fff;
 }
 
-.tm-card .tm-card-body { padding: 1.4rem; }
+.tm-card .tm-card-body { padding: 1.2rem; }
 
 /* ---------- Tables ---------- */
 .tm-table {
@@ -343,28 +343,28 @@ h4, h5, h6 {
 
 .tm-table thead th {
   font-family: var(--font-body);
-  font-size: .72rem;
-  font-weight: 700;
+  font-size: .7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .07em;
-  color: #8b6040;
-  background: #fdf0e0;
-  padding: .75rem 1rem;
-  border-bottom: 2px solid var(--clr-border);
+  letter-spacing: .06em;
+  color: #9a9a9a;
+  background: #fff;
+  padding: .5rem .85rem;
+  border-bottom: 1px solid #e5e5e5;
   white-space: nowrap;
 }
 
 .tm-table tbody tr {
-  transition: background .14s ease;
+  transition: background .1s ease;
 }
 
-.tm-table tbody tr:hover { background: #fdf0e0; }
+.tm-table tbody tr:hover { background: #fafafa; }
 
 .tm-table tbody td {
-  padding: .8rem 1rem;
-  border-bottom: 1px solid #eef1f0;
-  font-size: .875rem;
-  color: #2a3c38;
+  padding: .45rem .85rem;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: .82rem;
+  color: #1e1e1e;
   vertical-align: middle;
 }
 
@@ -417,43 +417,42 @@ h4, h5, h6 {
 
 /* ---------- Buttons ---------- */
 .btn-tm-primary {
-  background: linear-gradient(135deg, var(--clr-accent), var(--clr-accent-dark));
+  background: var(--clr-accent);
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
-  padding: .5rem 1.2rem;
-  font-size: .85rem;
+  border-radius: 4px;
+  padding: .35rem .9rem;
+  font-size: .78rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: .4rem;
+  gap: .3rem;
   text-decoration: none;
-  transition: opacity .18s ease, transform .15s ease, box-shadow .18s ease;
+  transition: opacity .15s ease, background .15s ease;
   font-family: var(--font-body);
 }
 
 .btn-tm-primary:hover {
-  opacity: .9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(201,124,46,.45);
+  opacity: .88;
+  background: var(--clr-accent-dark);
   color: #fff;
 }
 
 .btn-tm-secondary {
   background: transparent;
   color: var(--clr-accent);
-  border: 1.5px solid var(--clr-accent);
-  border-radius: var(--radius-sm);
-  padding: .5rem 1.2rem;
-  font-size: .85rem;
+  border: 1px solid var(--clr-accent);
+  border-radius: 4px;
+  padding: .3rem .8rem;
+  font-size: .76rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: .4rem;
+  gap: .3rem;
   text-decoration: none;
-  transition: background .18s ease, color .18s ease;
+  transition: background .15s ease, color .15s ease;
   font-family: var(--font-body);
 }
 
@@ -463,31 +462,31 @@ h4, h5, h6 {
 }
 
 .btn-tm-danger {
-  background: #fee2e2;
+  background: transparent;
   color: #dc2626;
-  border: 1.5px solid #fca5a5;
-  border-radius: var(--radius-sm);
-  padding: .4rem .9rem;
-  font-size: .8rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: .3rem .7rem;
+  font-size: .74rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: .3rem;
+  gap: .25rem;
   text-decoration: none;
-  transition: background .18s ease, color .18s ease;
+  transition: background .15s ease, color .15s ease;
   font-family: var(--font-body);
 }
 
-.btn-tm-danger:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+.btn-tm-danger:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
 .btn-tm-warning {
-  background: #fef3c7;
-  color: #d97706;
-  border: 1.5px solid #fcd34d;
-  border-radius: var(--radius-sm);
-  padding: .4rem .9rem;
-  font-size: .8rem;
+  background: transparent;
+  color: #b45309;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: .3rem .7rem;
+  font-size: .74rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
