@@ -102,9 +102,15 @@
                 <a href="{{ url_for('trek_details', trek_id=trek.trek_id) }}" class="btn-trek-info">
                     <i class="bi bi-info-circle-fill"></i> Details
                 </a>
+                {% if booked_trek_ids and trek.trek_id in booked_trek_ids %}
+                <a href="{{ url_for('user_bookings') }}" class="btn-trek-book booked" style="background:#16a34a; border-color:#16a34a;" title="You have booked this trek">
+                    <i class="bi bi-check-circle-fill"></i> Booked
+                </a>
+                {% else %}
                 <a href="{{ url_for('book_trek', trek_id=trek.trek_id) }}" class="btn-trek-book" id="book-trek-{{ trek.trek_id }}">
                     <i class="bi bi-bookmark-check-fill"></i> Book
                 </a>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -324,11 +324,13 @@ def user_dashboard():
         user_id=current_user.user_id,
         booking_status="Booked"
     ).all()
+    booked_trek_ids = [b.trek_id for b in bookings]
 
     return render_template(
         "user/dashboard.html",
         treks=treks,
         my_bookings=bookings,
+        booked_trek_ids=booked_trek_ids,
         difficulty=difficulty,
         keyword=keyword
     )
@@ -892,9 +894,16 @@ def trek_details(trek_id):
 
     trek = Trek.query.get_or_404(trek_id)
 
+    is_booked = Booking.query.filter_by(
+        user_id=current_user.user_id,
+        trek_id=trek.trek_id,
+        booking_status="Booked"
+    ).first() is not None
+
     return render_template(
         "user/trek_details.html",
-        trek=trek
+        trek=trek,
+        is_booked=is_booked
     )
 
 @app.route("/user/book/<int:trek_id>")
@@ -908,22 +917,26 @@ def book_trek(trek_id):
 
     existing_booking = Booking.query.filter_by(
         user_id=current_user.user_id,
-        trek_id=trek.trek_id
+        trek_id=trek.trek_id,
+        booking_status="Booked"
     ).first()
 
     if existing_booking:
-        return "You have already booked this trek."
+        flash("You have already booked this trek.", "info")
+        return redirect(url_for("user_bookings"))
 
     if trek.status != "Open":
-        return "This trek is not open for booking."
+        flash("This trek is not open for booking.", "warning")
+        return redirect(url_for("user_dashboard"))
 
     if trek.available_slots <= 0:
-        return "No slots available."
+        flash("No slots available for this trek.", "danger")
+        return redirect(url_for("user_dashboard"))
 
     booking = Booking(
         user_id=current_user.user_id,
         trek_id=trek.trek_id,
-        booking_date=date.today(),
+        booking_date=datetime.now(),
         booking_status="Booked"
     )
 
@@ -932,6 +945,7 @@ def book_trek(trek_id):
     db.session.add(booking)
     db.session.commit()
 
+    flash(f"Successfully booked '{trek.trek_name}'!", "success")
     return redirect(url_for("user_bookings"))
 
 @app.route("/user/bookings")
