@@ -3,6 +3,7 @@ from flask import request
 from flask import redirect
 from flask import url_for
 from flask import flash
+from flask import jsonify
 
 from flask import current_app as app
 
@@ -18,6 +19,11 @@ from datetime import date,datetime, timedelta
 
 
 from sqlalchemy import or_
+
+
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok", "application": "TrekALine", "version": "1.0.0"}), 200
 
 
 @app.route("/")
