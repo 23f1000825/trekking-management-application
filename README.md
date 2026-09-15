@@ -1,4 +1,4 @@
-# 🥾 Trek Management System
+# Trek Management System
 
 A role-based Trek Management System developed using **Flask**, **SQLAlchemy**, **SQLite**, **Bootstrap 5**, and **Chart.js**. The application allows administrators to manage treks and staff, trekkers to book and manage treks, and trek staff to oversee assigned treks.
 
@@ -55,59 +55,59 @@ A role-based Trek Management System developed using **Flask**, **SQLAlchemy**, *
 
 ```text
 Trekking-Management-Application/
-│
-├── application/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── controllers.py
-│   ├── database.py
-│   └── models.py
-│
-├── templates/
-│   ├── admin/
-│   │   ├── dashboard.html
-│   │   ├── add_trek.html
-│   │   ├── edit_trek.html
-│   │   ├── view_treks.html
-│   │   ├── view_staff.html
-│   │   ├── view_users.html
-│   │   ├── admin_bookings.html
-│   │   ├── admin_search.html
-│   │   └── ...
-│   │
-│   ├── staff/
-│   │   ├── dashboard.html
-│   │   ├── assigned_treks.html
-│   │   ├── participants.html
-│   │   ├── profile.html
-│   │   └── ...
-│   │
-│   ├── user/
-│   │   ├── dashboard.html
-│   │   ├── available_treks.html
-│   │   ├── booking_history.html
-│   │   ├── profile.html
-│   │   └── ...
-│   │
-│   ├── auth/
-│   │   ├── login.html
-│   │   ├── register.html
-│   │   └── staff_register.html
-│   │
-│   └── base_dashboard.html
-│
-├── static/
-│   ├── css/
-│   
-├── db_directory/
-│   └── trekking.sqlite3
-│
-├── main.py
-├── initial_data.py
-├── requirements.txt
-├── README.md
-├── Project_Report.pdf
-└── .gitignore
+
+ application/
+    __init__.py
+    config.py
+    controllers.py
+    database.py
+    models.py
+
+ templates/
+    admin/
+       dashboard.html
+       add_trek.html
+       edit_trek.html
+       view_treks.html
+       view_staff.html
+       view_users.html
+       admin_bookings.html
+       admin_search.html
+       ...
+   
+    staff/
+       dashboard.html
+       assigned_treks.html
+       participants.html
+       profile.html
+       ...
+   
+    user/
+       dashboard.html
+       available_treks.html
+       booking_history.html
+       profile.html
+       ...
+   
+    auth/
+       login.html
+       register.html
+       staff_register.html
+   
+    base_dashboard.html
+
+ static/
+    css/
+   
+ db_directory/
+    trekking.sqlite3
+
+ main.py
+ initial_data.py
+ requirements.txt
+ README.md
+ Project_Report.pdf
+ .gitignore
 ```
 ---
 
