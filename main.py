@@ -30,8 +30,11 @@ def create_app():
     login_manager.init_app(app)
     app.app_context().push()
 
+    from datetime import timedelta
+
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 
     @app.after_request
     def add_header(response):

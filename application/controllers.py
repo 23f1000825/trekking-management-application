@@ -4,6 +4,8 @@ from flask import redirect
 from flask import url_for
 from flask import flash
 from flask import jsonify
+from flask import session
+from flask import make_response
 
 from flask import current_app as app
 
@@ -15,11 +17,21 @@ from flask_login import current_user
 from application.database import db
 from application.models import User,Trek,Booking, StaffProfile
 from werkzeug.security import generate_password_hash, check_password_hash
+from application.auth_jwt import generate_jwt, decode_jwt, get_jwt_from_request
 
 from datetime import date,datetime, timedelta
-
-
 from sqlalchemy import or_
+
+@app.before_request
+def sync_jwt_auth():
+    if not current_user.is_authenticated:
+        token = get_jwt_from_request()
+        if token:
+            payload = decode_jwt(token)
+            if payload and "user_id" in payload:
+                user = User.query.get(payload["user_id"])
+                if user and not user.is_blacklisted:
+                    login_user(user, remember=True)
 
 
 @app.route("/health")
@@ -144,25 +156,40 @@ def login():
         flash("Waiting for Admin approval.", "warning")
         return render_template("login.html")
 
-    login_user(user)
-    flash(f"Welcome back, {user.name}!", "success")
+    session.permanent = True
+    login_user(user, remember=True)
+    token = generate_jwt(user)
+
+    user_info = {
+        "user_id": user.user_id,
+        "name": user.name,
+        "email": user.email,
+        "role": user.role
+    }
 
     if user.role == "Admin":
-        return redirect(url_for("admin_dashboard"))
+        target_url = url_for("admin_dashboard")
+    elif user.role == "Trek Staff":
+        target_url = url_for("staff_dashboard")
+    else:
+        target_url = url_for("user_dashboard")
 
-    if user.role == "Trek Staff":
-        return redirect(url_for("staff_dashboard"))
-
-    return redirect(url_for("user_dashboard"))
+    flash(f"Welcome back, {user.name}!", "success")
+    response = make_response(redirect(target_url))
+    response.set_cookie("jwt_token", token, max_age=86400 * 7, httponly=False, samesite="Lax")
+    response.headers["X-Auth-Token"] = token
+    return response
 
 @app.route("/logout")
 @login_required
 def logout():
 
     logout_user()
+    session.clear()
     flash("You have been logged out.", "info")
-
-    return redirect(url_for("login"))
+    response = make_response(redirect(url_for("login")))
+    response.delete_cookie("jwt_token")
+    return response
 
 @app.route("/admin/dashboard")
 @login_required
@@ -757,23 +784,44 @@ def staff_profile():
     if profile is None:
         profile = StaffProfile(
             user_id=current_user.user_id
-    )
-
+        )
         db.session.add(profile)
         db.session.commit()
 
     if request.method == "POST":
 
-        profile.contact_number = request.form["contact_number"]
-        profile.experience = request.form["experience"]
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        contact_number = request.form.get("contact_number", "").strip()
+        experience_raw = request.form.get("experience", "").strip()
+
+        if not name or not email:
+            flash("Name and email fields cannot be empty.", "danger")
+            return render_template("staff/profile.html", profile=profile, user=current_user)
+
+        existing_user = User.query.filter(
+            db.func.lower(User.email) == email,
+            User.user_id != current_user.user_id
+        ).first()
+
+        if existing_user:
+            flash("This email address is already in use by another account.", "danger")
+            return render_template("staff/profile.html", profile=profile, user=current_user)
+
+        current_user.name = name
+        current_user.email = email
+        profile.contact_number = contact_number
+        if experience_raw.isdigit():
+            profile.experience = int(experience_raw)
 
         db.session.commit()
-
-        return redirect(url_for("staff_dashboard"))
+        flash("Profile updated successfully.", "success")
+        return redirect(url_for("staff_profile"))
 
     return render_template(
         "staff/profile.html",
-        profile=profile
+        profile=profile,
+        user=current_user
     )
 
 @app.route("/staff/participants/<int:trek_id>")

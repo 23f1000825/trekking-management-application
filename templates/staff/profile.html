@@ -41,9 +41,37 @@
 
 <div class="form-section">
     <h2>Update Details</h2>
-    <p class="form-subtitle">Keep your contact information up to date.</p>
+    <p class="form-subtitle">Keep your personal and contact information up to date.</p>
 
     <form method="POST" id="staff-profile-form">
+
+        <div class="mb-3">
+            <label class="form-label-tm" for="name">Full Name</label>
+            <div class="search-bar" style="padding:.55rem .85rem;">
+                <i class="bi bi-person"></i>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ current_user.name }}"
+                    required
+                >
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label-tm" for="email">Email Address</label>
+            <div class="search-bar" style="padding:.55rem .85rem;">
+                <i class="bi bi-envelope"></i>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ current_user.email }}"
+                    required
+                >
+            </div>
+        </div>
 
         <div class="row g-3 mb-4">
             <div class="col-md-6">
