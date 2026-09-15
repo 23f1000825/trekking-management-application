@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 
-from application.config import LocalDevelopmentConfig
+from application.config import LocalDevelopmentConfig, ProductionConfig
 from application.database import db
 from application.database import login_manager
 from application.models import User
@@ -14,8 +14,9 @@ def create_app():
 
     app.secret_key = "trekking_management_secret_key"
 
-    if os.getenv("ENV", "development") == "production":
-        raise Exception("Currently no production config is setup.")
+    if os.getenv("ENV") == "production" or os.getenv("VERCEL"):
+        print("Starting Production Environment")
+        app.config.from_object(ProductionConfig)
     else:
         print("Starting Local Development")
         app.config.from_object(LocalDevelopmentConfig)
@@ -39,6 +40,12 @@ from application.controllers import *
 
 with app.app_context():
     db.create_all()
+    try:
+        if User.query.count() == 0:
+            from initial_data import seed
+            seed()
+    except Exception as e:
+        print("Seeding exception:", e)
 
 
 if __name__ == "__main__":
