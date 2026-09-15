@@ -28,13 +28,6 @@
         <img src="{{ url_for('static', filename='logo.png') }}" alt="TrekALine Logo" style="height:36px; width:36px; object-fit:contain; filter:brightness(0) invert(1);">
         TrekALine
     </div>
-
-    {% if current_user.is_authenticated %}
-    <div class="user-pill">
-        <span class="avatar-dot"></span>
-        <strong>{{ current_user.name }}</strong>
-    </div>
-    {% endif %}
 </nav>
 
 

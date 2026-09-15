@@ -73,44 +73,38 @@
     {% for trek in treks %}
     <div class="col-lg-4 col-md-6">
         <div class="trek-card">
-            <div class="trek-card-header">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                    <h5>{{ trek.trek_name }}</h5>
-                    {% if trek.difficulty == "Easy" %}<span class="badge-pill easy" style="font-size:.68rem;">Easy</span>
-                    {% elif trek.difficulty == "Moderate" %}<span class="badge-pill moderate" style="font-size:.68rem;">Moderate</span>
-                    {% else %}<span class="badge-pill hard" style="font-size:.68rem;">Hard</span>{% endif %}
-                </div>
-                <div class="location-tag">
+            <div class="trek-card-top-meta">
+                <span><i class="bi bi-clock me-1"></i>{{ trek.duration }} Days</span>
+                <span class="meta-separator">▪</span>
+                {% if trek.difficulty == "Easy" %}<span class="difficulty-tag easy">Easy</span>
+                {% elif trek.difficulty == "Moderate" %}<span class="difficulty-tag moderate">Moderate</span>
+                {% else %}<span class="difficulty-tag hard">Hard</span>{% endif %}
+                <span class="meta-separator">▪</span>
+                <span class="slots-tag"><i class="bi bi-person-fill me-1"></i>{{ trek.available_slots }} slots</span>
+            </div>
+
+            <div class="trek-card-body">
+                <h4 class="trek-name">{{ trek.trek_name }}</h4>
+                
+                <div class="trek-location-pill">
                     <i class="bi bi-geo-alt-fill"></i> {{ trek.location }}
                 </div>
+
+                {% if trek.start_date and trek.end_date %}
+                <div class="trek-dates-info">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    {{ trek.start_date.strftime('%d %b') }} – {{ trek.end_date.strftime('%d %b %Y') }}
+                </div>
+                {% endif %}
             </div>
-            <div class="trek-card-body">
-                <div class="trek-meta">
-                    <div class="trek-meta-item">
-                        <i class="bi bi-clock"></i>
-                        {{ trek.duration }} days
-                    </div>
-                    {% if trek.start_date and trek.end_date %}
-                    <div class="trek-meta-item">
-                        <i class="bi bi-calendar3"></i>
-                        {{ trek.start_date.strftime('%d %b') }} – {{ trek.end_date.strftime('%d %b %Y') }}
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="trek-slots">
-                    <i class="bi bi-people" style="font-size:.8rem;"></i>
-                    <span>{{ trek.available_slots }}</span> slots available
-                </div>
-            </div>
-            <div class="trek-card-footer">
-                <div style="display:flex;gap:.5rem;">
-                    <a href="{{ url_for('trek_details', trek_id=trek.trek_id) }}" class="btn-tm-secondary" style="flex:1;justify-content:center;">
-                        <i class="bi bi-info-circle"></i> Details
-                    </a>
-                    <a href="{{ url_for('book_trek', trek_id=trek.trek_id) }}" class="btn-tm-primary" style="flex:1;justify-content:center;" id="book-trek-{{ trek.trek_id }}">
-                        <i class="bi bi-bookmark-plus-fill"></i> Book
-                    </a>
-                </div>
+
+            <div class="trek-card-actions">
+                <a href="{{ url_for('trek_details', trek_id=trek.trek_id) }}" class="btn-trek-info">
+                    <i class="bi bi-info-circle-fill"></i> Details
+                </a>
+                <a href="{{ url_for('book_trek', trek_id=trek.trek_id) }}" class="btn-trek-book" id="book-trek-{{ trek.trek_id }}">
+                    <i class="bi bi-bookmark-check-fill"></i> Book
+                </a>
             </div>
         </div>
     </div>

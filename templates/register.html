@@ -40,6 +40,20 @@
             <h2>Create Account</h2>
             <p class="auth-sub">Fill in your details to get started.</p>
 
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="tm-alert {{ category }}" role="alert" style="margin-bottom: 1.25rem;">
+                            <i class="bi {% if category == 'success' %}bi-check-circle-fill{% elif category == 'danger' %}bi-exclamation-circle-fill{% elif category == 'warning' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
+                            {{ message }}
+                            <button class="close-alert" onclick="this.parentElement.remove()" aria-label="Dismiss">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <form method="POST" id="register-form">
 
                 <div class="mb-3">
@@ -74,7 +88,7 @@
 
                 <div class="mb-3">
                     <label class="form-label-tm" for="password">Password</label>
-                    <div class="search-bar" style="padding: .55rem .85rem;">
+                    <div class="search-bar" style="padding: .55rem .85rem; display:flex; align-items:center;">
                         <i class="bi bi-lock"></i>
                         <input
                             type="password"
@@ -83,7 +97,26 @@
                             placeholder="••••••••"
                             required
                             autocomplete="new-password"
+                            style="flex:1;"
                         >
+                        <i class="bi bi-eye" onclick="togglePasswordVisibility('password', this)" style="cursor:pointer; opacity:.6; font-size:.95rem;" title="Toggle Password Visibility"></i>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-tm" for="confirm_password">Confirm Password</label>
+                    <div class="search-bar" style="padding: .55rem .85rem; display:flex; align-items:center;">
+                        <i class="bi bi-shield-lock"></i>
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="••••••••"
+                            required
+                            autocomplete="new-password"
+                            style="flex:1;"
+                        >
+                        <i class="bi bi-eye" onclick="togglePasswordVisibility('confirm_password', this)" style="cursor:pointer; opacity:.6; font-size:.95rem;" title="Toggle Password Visibility"></i>
                     </div>
                 </div>
 
@@ -115,6 +148,21 @@
     </div>
 
 </div>
+
+<script>
+function togglePasswordVisibility(fieldId, iconElem) {
+    const input = document.getElementById(fieldId);
+    if (input.type === "password") {
+        input.type = "text";
+        iconElem.classList.remove("bi-eye");
+        iconElem.classList.add("bi-eye-slash");
+    } else {
+        input.type = "password";
+        iconElem.classList.remove("bi-eye-slash");
+        iconElem.classList.add("bi-eye");
+    }
+}
+</script>
 
 </body>
 </html>

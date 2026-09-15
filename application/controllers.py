@@ -14,6 +14,7 @@ from flask_login import current_user
 
 from application.database import db
 from application.models import User,Trek,Booking, StaffProfile
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from datetime import date,datetime, timedelta
 
@@ -43,18 +44,35 @@ def home():
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
+
     if request.method == "GET":
         return render_template("register.html")
 
-    name = request.form["name"]
-    email = request.form["email"]
-    password = request.form["password"]
-    role = request.form["role"]
+    name = request.form.get("name", "").strip()
+    email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password", "")
+    confirm_password = request.form.get("confirm_password", "")
+    role = request.form.get("role", "User")
 
-    user = User.query.filter_by(email=email).first()
+    if not name or not email or not password:
+        flash("Please fill in all required fields.", "danger")
+        return render_template("register.html")
+
+    if confirm_password and password != confirm_password:
+        flash("Passwords do not match. Please verify your password.", "danger")
+        return render_template("register.html")
+
+    if len(password) < 4:
+        flash("Password must be at least 4 characters long.", "danger")
+        return render_template("register.html")
+
+    user = User.query.filter(db.func.lower(User.email) == email).first()
 
     if user:
-        return "User already exists."
+        flash("An account with this email address already exists.", "danger")
+        return render_template("register.html")
 
     approved = False
 
@@ -64,7 +82,7 @@ def register():
     new_user = User(
         name=name,
         email=email,
-        password=password,
+        password=generate_password_hash(password),
         role=role,
         is_approved=approved
     )
@@ -75,37 +93,59 @@ def register():
     if role == "Trek Staff":
         profile = StaffProfile(
             user_id=new_user.user_id
-    )
+        )
 
         db.session.add(profile)
         db.session.commit()
+        flash("Staff account created successfully! Please wait for Admin approval.", "info")
+    else:
+        flash("Account created successfully! Please log in.", "success")
 
     return redirect(url_for("login"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
+
     if request.method == "GET":
         return render_template("login.html")
 
-    email = request.form["email"]
-    password = request.form["password"]
+    email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password", "")
 
-    user = User.query.filter_by(
-        email=email,
-        password=password
+    user = User.query.filter(
+        db.func.lower(User.email) == email
     ).first()
 
     if user is None:
-        return "Invalid Email or Password."
+        flash("Invalid Email or Password.", "danger")
+        return render_template("login.html")
+
+    password_matches = False
+    try:
+        password_matches = check_password_hash(user.password, password)
+    except Exception:
+        pass
+
+    if not password_matches and user.password == password:
+        password_matches = True
+
+    if not password_matches:
+        flash("Invalid Email or Password.", "danger")
+        return render_template("login.html")
 
     if user.is_blacklisted:
-        return "Your account has been blacklisted."
+        flash("Your account has been blacklisted.", "danger")
+        return render_template("login.html")
 
     if user.role == "Trek Staff" and user.is_approved is False:
-        return "Waiting for Admin approval."
+        flash("Waiting for Admin approval.", "warning")
+        return render_template("login.html")
 
     login_user(user)
+    flash(f"Welcome back, {user.name}!", "success")
 
     if user.role == "Admin":
         return redirect(url_for("admin_dashboard"))
@@ -120,6 +160,7 @@ def login():
 def logout():
 
     logout_user()
+    flash("You have been logged out.", "info")
 
     return redirect(url_for("login"))
 
@@ -766,12 +807,28 @@ def user_profile():
 
     if request.method == "POST":
 
-        current_user.name = request.form["name"]
-        current_user.email = request.form["email"]
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+
+        if not name or not email:
+            flash("Name and email fields cannot be empty.", "danger")
+            return render_template("user/profile.html", user=current_user)
+
+        existing_user = User.query.filter(
+            db.func.lower(User.email) == email,
+            User.user_id != current_user.user_id
+        ).first()
+
+        if existing_user:
+            flash("This email address is already in use by another account.", "danger")
+            return render_template("user/profile.html", user=current_user)
+
+        current_user.name = name
+        current_user.email = email
 
         db.session.commit()
-
-        return redirect(url_for("user_dashboard"))
+        flash("Profile updated successfully.", "success")
+        return redirect(url_for("user_profile"))
 
     return render_template(
         "user/profile.html",
