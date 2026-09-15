@@ -10,7 +10,12 @@ app = None
 
 
 def create_app():
-    app = Flask(__name__, template_folder="templates")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(base_dir, "templates"),
+        static_folder=os.path.join(base_dir, "static")
+    )
 
     app.secret_key = "trekking_management_secret_key"
 
