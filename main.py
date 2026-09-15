@@ -41,7 +41,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-from application.controllers import *
+import application.controllers
 
 with app.app_context():
     try:
