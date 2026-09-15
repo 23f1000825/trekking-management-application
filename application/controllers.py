@@ -32,7 +32,7 @@ def home():
 
         return redirect(url_for("user_dashboard"))
 
-    return redirect(url_for("login"))
+    return render_template("index.html")
 
 #register user
 @app.route("/register", methods=["GET", "POST"])
