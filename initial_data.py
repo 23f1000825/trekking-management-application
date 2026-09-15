@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from main import app
 from application.database import db
 from application.models import User, Trek, Booking, StaffProfile
@@ -10,9 +9,6 @@ def seed():
 
         db.create_all()
 
-        # ──────────────────────────────────────────────
-        # 1. ADMIN
-        # ──────────────────────────────────────────────
         admin = User.query.filter_by(email="admin@trek.com").first()
         if admin is None:
             admin = User(
@@ -30,9 +26,6 @@ def seed():
         else:
             print("[-] Admin already exists")
 
-        # ──────────────────────────────────────────────
-        # 2. TREK STAFF  (4 members)
-        # ──────────────────────────────────────────────
         staff_data = [
             {
                 "name": "Rajan Sharma",
@@ -78,7 +71,7 @@ def seed():
                     is_active=True
                 )
                 db.session.add(user)
-                db.session.flush()  # get the user_id
+                db.session.flush()
 
                 profile = StaffProfile(
                     user_id=user.user_id,
@@ -95,9 +88,6 @@ def seed():
 
         db.session.commit()
 
-        # ──────────────────────────────────────────────
-        # 3. TREKKER USERS  (6 users)
-        # ──────────────────────────────────────────────
         user_data = [
             {"name": "Alice Johnson",   "email": "alice@gmail.com",   "password": "user123"},
             {"name": "Bob Martinez",    "email": "bob@gmail.com",     "password": "user123"},
@@ -129,9 +119,6 @@ def seed():
 
         db.session.commit()
 
-        # ──────────────────────────────────────────────
-        # 4. TREKS  (8 treks across statuses)
-        # ──────────────────────────────────────────────
         today = date.today()
 
         trek_data = [
@@ -142,8 +129,8 @@ def seed():
                 "duration":        14,
                 "available_slots": 12,
                 "status":          "Open",
-                "start_offset":    30,   # days from today
-                "staff_index":     0,    # rajan
+                "start_offset":    30,
+                "staff_index":     0,
             },
             {
                 "trek_name":       "Everest Panorama Trail",
@@ -163,7 +150,7 @@ def seed():
                 "available_slots": 15,
                 "status":          "Open",
                 "start_offset":    45,
-                "staff_index":     2,    # thomas
+                "staff_index":     2,
             },
             {
                 "trek_name":       "Mont Blanc Express",
@@ -173,7 +160,7 @@ def seed():
                 "available_slots": 10,
                 "status":          "Open",
                 "start_offset":    60,
-                "staff_index":     3,    # sofia
+                "staff_index":     3,
             },
             {
                 "trek_name":       "Kerala Western Ghats",
@@ -183,7 +170,7 @@ def seed():
                 "available_slots": 20,
                 "status":          "Open",
                 "start_offset":    15,
-                "staff_index":     1,    # priya
+                "staff_index":     1,
             },
             {
                 "trek_name":       "Patagonia Ridge Walk",
@@ -202,7 +189,7 @@ def seed():
                 "duration":        9,
                 "available_slots": 4,
                 "status":          "Ongoing",
-                "start_offset":    -5,   # started 5 days ago
+                "start_offset":    -5,
                 "staff_index":     0,
             },
             {
@@ -249,11 +236,7 @@ def seed():
 
         db.session.commit()
 
-        # ──────────────────────────────────────────────
-        # 5. BOOKINGS  (12 bookings, varied statuses)
-        # ──────────────────────────────────────────────
         bookings_data = [
-            # (user_index, trek_index, booking_status, days_ago_booked)
             (0, 0, "Booked",    7),
             (1, 0, "Booked",    5),
             (2, 0, "Booked",    3),
@@ -263,11 +246,11 @@ def seed():
             (0, 2, "Booked",    6),
             (1, 4, "Booked",    2),
             (2, 4, "Booked",    1),
-            (3, 6, "Booked",    14),  # Ongoing trek
-            (4, 6, "Booked",    14),  # Ongoing trek
-            (5, 7, "Completed", 40),  # Completed trek
-            (0, 7, "Completed", 38),  # Completed trek
-            (1, 5, "Cancelled", 20),  # Cancelled on closed trek
+            (3, 6, "Booked",    14),
+            (4, 6, "Booked",    14),
+            (5, 7, "Completed", 40),
+            (0, 7, "Completed", 38),
+            (1, 5, "Cancelled", 20),
         ]
 
         for (ui, ti, status, days_ago) in bookings_data:
@@ -277,7 +260,6 @@ def seed():
             user  = trekker_users[ui]
             trek  = treks[ti]
 
-            # Avoid duplicates
             exists = Booking.query.filter_by(
                 user_id=user.user_id,
                 trek_id=trek.trek_id

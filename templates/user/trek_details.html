@@ -34,9 +34,9 @@
     </a>
 </div>
 
-<!-- Trek Details Card -->
+
 <div class="tm-card mb-4">
-    <!-- Header Banner -->
+    
     <div style="background:linear-gradient(135deg, var(--clr-accent) 0%, var(--clr-accent-dark) 100%); padding:1.8rem 2rem;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
             <div>
@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <!-- Details Grid -->
+    
     <div class="tm-card-body">
         <div class="row g-3">
             <div class="col-md-3 col-sm-6">
@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    <!-- Action Footer -->
+    
     <div style="padding:1.2rem 2rem;border-top:1px solid var(--clr-border);display:flex;gap:.75rem;align-items:center;">
         {% if trek.status == "Open" and trek.available_slots > 0 %}
             <a href="{{ url_for('book_trek', trek_id=trek.trek_id) }}" class="btn-tm-primary" style="padding:.65rem 1.8rem;" id="book-now-btn">

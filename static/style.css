@@ -1,37 +1,33 @@
-/* ===================================================
-   TREKKING MANAGEMENT — DESIGN SYSTEM
-   Palette: Warm Amber / Burnt Sienna (from trekker sunset photo)
-   Fonts: Playfair Display (headings) · Inter (body) · Helvetica Neue (brand)
-   =================================================== */
 
-/* ---------- Google Fonts Import ---------- */
+
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
 
-/* ---------- Design Tokens ---------- */
+
 :root {
-  /* ── Sidebar (warm deep brown) ── */
+  
   --clr-sidebar-bg:          #1c0e05;
   --clr-sidebar-hover:       #2e1508;
   --clr-sidebar-active:      #c97c2e;
   --clr-sidebar-text:        #d4b896;
   --clr-sidebar-text-active: #ffffff;
 
-  /* ── Primary accent (golden amber) ── */
+  
   --clr-accent:       #c97c2e;
   --clr-accent-light: #e8943a;
   --clr-accent-dark:  #9b5c1a;
 
-  /* ── Page surfaces ── */
+  
   --clr-page-bg:  #fdf6ee;
   --clr-card-bg:  #ffffff;
   --clr-border:   #ead9c6;
 
-  /* ── Typography ── */
+  
   --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-brand:   'Helvetica Neue', Helvetica, Arial, sans-serif;
 
-  /* ── Status colors (kept readable, warm-shifted) ── */
+  
   --clr-open:         #b45309;
   --clr-open-bg:      #fef3c7;
   --clr-closed:       #dc2626;
@@ -43,7 +39,7 @@
   --clr-pending:      #7c3aed;
   --clr-pending-bg:   #ede9fe;
 
-  /* ── Difficulty ── */
+  
   --clr-easy:        #15803d;
   --clr-easy-bg:     #dcfce7;
   --clr-moderate:    #b45309;
@@ -51,18 +47,18 @@
   --clr-hard:        #dc2626;
   --clr-hard-bg:     #fee2e2;
 
-  /* ── Shadows ── */
+  
   --shadow-sm: 0 1px 3px rgba(100,50,10,.08);
   --shadow-md: 0 4px 16px rgba(100,50,10,.12);
   --shadow-lg: 0 8px 32px rgba(100,50,10,.18);
 
-  /* ── Radius ── */
+  
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
 }
 
-/* ---------- Global Reset ---------- */
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
@@ -76,7 +72,7 @@ body {
   margin: 0;
 }
 
-/* ---------- Typography ---------- */
+
 h1, h2, h3 {
   font-family: var(--font-heading);
   font-weight: 700;
@@ -89,7 +85,7 @@ h4, h5, h6 {
   color: #1e2d2a;
 }
 
-/* ---------- Top Navbar ---------- */
+
 .tm-navbar {
   background: linear-gradient(90deg, #1c0e05 0%, #2e1508 100%);
   font-family: var(--font-brand);
@@ -142,13 +138,13 @@ h4, h5, h6 {
   background: #e8943a;
 }
 
-/* ---------- Layout ---------- */
+
 .tm-layout {
   display: flex;
   min-height: calc(100vh - 56px);
 }
 
-/* ---------- Sidebar ---------- */
+
 .tm-sidebar {
   width: 230px;
   min-width: 230px;
@@ -220,14 +216,14 @@ h4, h5, h6 {
   border-color: rgba(255,255,255,.07);
 }
 
-/* ---------- Main Content ---------- */
+
 .tm-content {
   flex: 1;
   padding: 2rem 2.2rem;
   overflow-y: auto;
 }
 
-/* ---------- Page Header ---------- */
+
 .page-header {
   display: flex;
   align-items: center;
@@ -241,7 +237,7 @@ h4, h5, h6 {
   margin: 0;
 }
 
-/* ---------- Stat Cards ---------- */
+
 .stat-card {
   background: var(--clr-card-bg);
   border-radius: var(--radius-md);
@@ -299,7 +295,7 @@ h4, h5, h6 {
   color: #111c19;
 }
 
-/* Card color variants */
+
 .stat-card.green .stat-icon  { background: #fde68a; color: #b45309; }
 .stat-card.green::before      { background: #b45309; }
 .stat-card.blue .stat-icon   { background: #fed7aa; color: #9b5c1a; }
@@ -311,7 +307,7 @@ h4, h5, h6 {
 .stat-card.teal .stat-icon   { background: #ffedd5; color: #ea580c; }
 .stat-card.teal::before       { background: #ea580c; }
 
-/* ---------- Cards ---------- */
+
 .tm-card {
   background: var(--clr-card-bg);
   border-radius: var(--radius-md);
@@ -334,7 +330,7 @@ h4, h5, h6 {
 
 .tm-card .tm-card-body { padding: 1.2rem; }
 
-/* ---------- Tables ---------- */
+
 .tm-table {
   width: 100%;
   border-collapse: separate;
@@ -370,7 +366,7 @@ h4, h5, h6 {
 
 .tm-table tbody tr:last-child td { border-bottom: none; }
 
-/* ---------- Badges / Pills ---------- */
+
 .badge-pill {
   display: inline-flex;
   align-items: center;
@@ -399,7 +395,7 @@ h4, h5, h6 {
 .badge-pill.booked     { background: #dbeafe; color: #2563eb; }
 .badge-pill.cancelled  { background: #fee2e2; color: #dc2626; }
 
-/* ---------- Avatar Initials ---------- */
+
 .avatar-init {
   width: 34px;
   height: 34px;
@@ -415,7 +411,7 @@ h4, h5, h6 {
   font-family: var(--font-body);
 }
 
-/* ---------- Buttons ---------- */
+
 .btn-tm-primary {
   background: var(--clr-accent);
   color: #fff;
@@ -523,7 +519,7 @@ h4, h5, h6 {
   font-size: .78rem;
 }
 
-/* ---------- Forms ---------- */
+
 .form-section {
   background: var(--clr-card-bg);
   border-radius: var(--radius-md);
@@ -576,7 +572,7 @@ h4, h5, h6 {
 
 select.form-control-tm { cursor: pointer; }
 
-/* ---------- Search Bar ---------- */
+
 .search-bar {
   display: flex;
   align-items: center;
@@ -605,7 +601,7 @@ select.form-control-tm { cursor: pointer; }
   flex: 1;
 }
 
-/* ---------- Flash / Alert ---------- */
+
 .tm-alert {
   display: flex;
   align-items: center;
@@ -640,7 +636,7 @@ select.form-control-tm { cursor: pointer; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- Auth Pages ---------- */
+
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -742,7 +738,7 @@ select.form-control-tm { cursor: pointer; }
   margin-bottom: 2rem;
 }
 
-/* ---------- Trek Card (User Dashboard) ---------- */
+
 .trek-card {
   background: #fff;
   border-radius: var(--radius-md);
@@ -818,7 +814,7 @@ select.form-control-tm { cursor: pointer; }
   border-top: 1px solid var(--clr-border);
 }
 
-/* ---------- Utility ---------- */
+
 .text-muted-sm { font-size: .8rem; color: #6b8880; }
 .section-title {
   font-family: var(--font-heading);
@@ -835,7 +831,7 @@ select.form-control-tm { cursor: pointer; }
 
 .divider { border: none; border-top: 1px solid var(--clr-border); margin: 1.5rem 0; }
 
-/* ---------- Chart Cards ---------- */
+
 .chart-card {
   background: #fff;
   border-radius: var(--radius-md);
@@ -856,7 +852,7 @@ select.form-control-tm { cursor: pointer; }
 
 .chart-card h5 i { color: #c97c2e; }
 
-/* ---------- Responsive ---------- */
+
 @media (max-width: 900px) {
   .tm-sidebar { width: 200px; min-width: 200px; }
   .auth-left { display: none; }

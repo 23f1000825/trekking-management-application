@@ -37,7 +37,7 @@
     <span class="text-muted-sm"><i class="bi bi-clock me-1"></i>Live data</span>
 </div>
 
-<!-- Stat Cards -->
+
 <div class="row g-3 mb-4">
     <div class="col-md-3 col-sm-6">
         <div class="stat-card green">
@@ -79,7 +79,7 @@
 
 <hr class="divider">
 
-<!-- Charts Row -->
+
 <div class="row g-3 mb-3">
     <div class="col-lg-6">
         <div class="chart-card">
@@ -120,7 +120,6 @@ const trekData    = {{ trek_chart | tojson | safe }};
 const bookingData = {{ booking_chart | tojson | safe }};
 const userData    = {{ user_chart | tojson | safe }};
 
-// Trek Status Doughnut
 new Chart(document.getElementById("trekChart"), {
     type: "doughnut",
     data: {
@@ -139,7 +138,6 @@ new Chart(document.getElementById("trekChart"), {
     }
 });
 
-// Bookings Bar
 new Chart(document.getElementById("bookingChart"), {
     type: "bar",
     data: {
@@ -160,7 +158,6 @@ new Chart(document.getElementById("bookingChart"), {
     }
 });
 
-// Users Horizontal Bar
 new Chart(document.getElementById("userChart"), {
     type: "bar",
     data: {

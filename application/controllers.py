@@ -40,7 +40,6 @@ def home():
 
     return render_template("index.html")
 
-#register user
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -83,7 +82,6 @@ def register():
 
     return redirect(url_for("login"))
 
-#login
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -117,7 +115,6 @@ def login():
 
     return redirect(url_for("user_dashboard"))
 
-#logout
 @app.route("/logout")
 @login_required
 def logout():
@@ -126,7 +123,6 @@ def logout():
 
     return redirect(url_for("login"))
 
-# ADMIN DASHBOARD
 @app.route("/admin/dashboard")
 @login_required
 def admin_dashboard():
@@ -139,14 +135,12 @@ def admin_dashboard():
     total_staff = User.query.filter_by(role="Trek Staff").count()
     total_bookings = Booking.query.count()
 
-    # -------- Trek Status Chart --------
 
     open_treks = Trek.query.filter_by(status="Open").count()
     closed_treks = Trek.query.filter_by(status="Closed").count()
     ongoing_treks = Trek.query.filter_by(status="Ongoing").count()
     completed_treks = Trek.query.filter_by(status="Completed").count()
 
-    # -------- Booking Status Chart --------
 
     booked = Booking.query.filter_by(booking_status="Booked").count()
     cancelled = Booking.query.filter_by(booking_status="Cancelled").count()
@@ -178,11 +172,10 @@ def admin_dashboard():
         user_chart=[
             total_users,
             total_staff,
-            1      # one predefined admin
+            1
         ]
     )
 
-# STAFF DASHBOARD
 @app.route("/staff/dashboard")
 @login_required
 def staff_dashboard():
@@ -199,7 +192,6 @@ def staff_dashboard():
     total_participants = 0
     open_treks = 0
 
-    # Data for Chart.js
     trek_labels = []
     participant_counts = []
 
@@ -220,7 +212,6 @@ def staff_dashboard():
             "participant_count": participant_count
         })
 
-        # Chart data
         trek_labels.append(trek.trek_name)
         participant_counts.append(participant_count)
 
@@ -274,7 +265,6 @@ def user_dashboard():
         keyword=keyword
     )
 
-#ADMIN CRUD OPS
 @app.route("/admin/treks")
 @login_required
 def view_treks():
@@ -456,7 +446,6 @@ def delete_trek(trek_id):
 
     trek = Trek.query.get_or_404(trek_id)
 
-    # Prevent deletion if bookings exist
     if trek.bookings:
         flash(
             "Cannot delete a trek that has bookings.","danger"
@@ -473,7 +462,6 @@ def delete_trek(trek_id):
 
     return redirect(url_for("view_treks"))
 
-#ADMIN STAFF VIEW
 @app.route("/admin/staff")
 @login_required
 def view_staff():
@@ -490,7 +478,6 @@ def view_staff():
         staff=staff
     )
 
-#ADMIN APPROVAl TO STAFF
 @app.route("/admin/staff/approve/<int:user_id>")
 @login_required
 def approve_staff(user_id):
@@ -506,7 +493,6 @@ def approve_staff(user_id):
 
     return redirect(url_for("view_staff"))
 
-#ADMIN STAFF DELETE
 @app.route("/admin/staff/delete/<int:user_id>")
 @login_required
 def delete_staff(user_id):
@@ -531,7 +517,6 @@ def delete_staff(user_id):
 
     return redirect(url_for("view_staff"))
 
-#ADMIN BLACKLISTS STAFF
 @app.route("/admin/staff/blacklist/<int:user_id>")
 @login_required
 def blacklist_staff(user_id):
@@ -550,7 +535,6 @@ def blacklist_staff(user_id):
 
     return redirect(url_for("view_staff"))
 
-#ACTIVATES/REMOVE STAFF FROM BLACKLIST
 @app.route("/admin/staff/activate/<int:user_id>")
 @login_required
 def activate_staff(user_id):
@@ -569,7 +553,6 @@ def activate_staff(user_id):
 
     return redirect(url_for("view_staff"))
 
-#ADMIN USER VIEW
 @app.route("/admin/users")
 @login_required
 def view_users():
@@ -594,7 +577,6 @@ def view_users():
         search=search
     )
 
-#BLACKLIST USER
 @app.route("/admin/users/blacklist/<int:user_id>")
 @login_required
 def blacklist_user(user_id):
@@ -610,7 +592,6 @@ def blacklist_user(user_id):
 
     return redirect(url_for("view_users"))
 
-#ACTIVATE USER
 @app.route("/admin/users/activate/<int:user_id>")
 @login_required
 def activate_user(user_id):
@@ -626,7 +607,6 @@ def activate_user(user_id):
 
     return redirect(url_for("view_users"))
 
-#ADMIN SEARCH 
 @app.route("/admin/search", methods=["GET", "POST"])
 @login_required
 def admin_search():
