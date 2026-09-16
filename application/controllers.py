@@ -267,9 +267,9 @@ def staff_dashboard():
 
     for trek in treks:
 
-        participant_count = Booking.query.filter_by(
-            trek_id=trek.trek_id,
-            booking_status="Booked"
+        participant_count = Booking.query.filter(
+            Booking.trek_id == trek.trek_id,
+            Booking.booking_status != "Cancelled"
         ).count()
 
         total_participants += participant_count
