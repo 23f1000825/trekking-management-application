@@ -741,31 +741,52 @@ def staff_trek(trek_id):
         trek_id=trek.trek_id
     ).all()
 
+    if request.method == "POST":
+
+        action = request.form.get("action")
+        booking_id = request.form.get("booking_id")
+
+        if action == "cancel_booking" and booking_id:
+            target_booking = Booking.query.get(int(booking_id))
+            if target_booking and target_booking.trek_id == trek.trek_id:
+                if target_booking.booking_status == "Booked":
+                    target_booking.booking_status = "Cancelled"
+                    target_booking.payment_status = "Refunded"
+                    trek.available_slots += 1
+                    flash(f"Booking for {target_booking.user.name} cancelled.", "info")
+        elif action == "complete_booking" and booking_id:
+            target_booking = Booking.query.get(int(booking_id))
+            if target_booking and target_booking.trek_id == trek.trek_id:
+                target_booking.booking_status = "Completed"
+                flash(f"Booking for {target_booking.user.name} marked as completed.", "success")
+        else:
+            if "available_slots" in request.form:
+                try:
+                    slots_val = int(request.form.get("available_slots"))
+                    if slots_val >= 0:
+                        trek.available_slots = slots_val
+                except (ValueError, TypeError):
+                    pass
+
+            if action == "started":
+                trek.status = "Started"
+                flash("Trek status updated to Started.", "success")
+            elif action == "completed":
+                trek.status = "Completed"
+                for booking in bookings:
+                    if booking.booking_status == "Booked":
+                        booking.booking_status = "Completed"
+                flash("Trek status updated to Completed.", "success")
+            elif action == "update":
+                flash("Trek details updated successfully.", "success")
+
+        db.session.commit()
+        return redirect(url_for("staff_trek", trek_id=trek.trek_id))
+
     total_slots = trek.available_slots + len([
         b for b in bookings
         if b.booking_status == "Booked"
     ])
-
-    if request.method == "POST":
-
-        action = request.form["action"]
-
-        if action == "started":
-            trek.status = "Started"
-
-        elif action == "completed":
-
-            trek.status = "Completed"
-
-            for booking in bookings:
-                if booking.booking_status == "Booked":
-                    booking.booking_status = "Completed"
-
-        trek.available_slots = int(request.form["available_slots"])
-
-        db.session.commit()
-
-        return redirect(url_for("staff_trek", trek_id=trek.trek_id))
 
     return render_template(
         "staff/trek.html",
