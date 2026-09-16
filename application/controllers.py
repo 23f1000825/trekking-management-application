@@ -31,7 +31,7 @@ def sync_jwt_auth():
             if payload and "user_id" in payload:
                 user = User.query.get(payload["user_id"])
                 if user and not user.is_blacklisted:
-                    login_user(user, remember=True)
+                    login_user(user, remember=False)
 
 
 @app.route("/health")
@@ -157,7 +157,7 @@ def login():
         return render_template("login.html")
 
     session.permanent = True
-    login_user(user, remember=True)
+    login_user(user, remember=False)
     token = generate_jwt(user)
 
     user_info = {
@@ -181,14 +181,16 @@ def login():
     return response
 
 @app.route("/logout")
-@login_required
 def logout():
-
     logout_user()
     session.clear()
-    flash("You have been logged out.", "info")
+
     response = make_response(redirect(url_for("login")))
-    response.delete_cookie("jwt_token")
+
+    response.delete_cookie("jwt_token", path="/")
+    response.delete_cookie("remember_token", path="/")
+    response.delete_cookie("session", path="/")
+
     return response
 
 @app.route("/admin/dashboard")
