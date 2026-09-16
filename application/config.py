@@ -22,6 +22,5 @@ class LocalDevelopmentConfig(Config):
 
 
 class ProductionConfig(Config):
-    SQLITE_DB_DIR = os.getenv("TMPDIR", "/tmp")
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "trekking.sqlite3")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     DEBUG = False
