@@ -1,34 +1,260 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Trekking Management Application</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrekALine — Trekking Management Platform</title>
+    <meta name="description" content="TrekALine — manage treks, staff, and bookings or explore and book your next adventure.">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/favicon.png">
 
-    <link rel="stylesheet" type="text/css"
-        href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #fff; }
+
+        /*  Professional Navbar  */
+        .site-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 200;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201, 124, 46, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 3rem;
+        }
+
+        .nav-brand {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: .04em;
+            color: #1c0e05;
+            text-decoration: none;
+        }
+
+        .nav-brand em {
+            color: #c97c2e;
+            font-style: normal;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            font-size: .85rem;
+            font-weight: 500;
+            color: #3d2010;
+            text-decoration: none;
+            letter-spacing: .02em;
+            transition: color .15s ease;
+        }
+
+        .nav-links a:hover { color: #c97c2e; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-login {
+            font-size: .85rem;
+            font-weight: 600;
+            color: #1c0e05;
+            text-decoration: none;
+            letter-spacing: .02em;
+            transition: color .15s ease;
+        }
+
+        .nav-login:hover { color: #c97c2e; }
+
+        .nav-register {
+            background: #c97c2e;
+            color: #fff;
+            font-size: .82rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            padding: .5rem 1.4rem;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background .18s ease;
+        }
+
+        .nav-register:hover { background: #9b5c1a; color: #fff; }
+
+        /*  Hero  */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 580px;
+            background: url('/static/hero.jpg') center 40% / cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 3rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                105deg,
+                rgba(28, 14, 5, 0.78) 0%,
+                rgba(28, 14, 5, 0.45) 55%,
+                rgba(28, 14, 5, 0.10) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 580px;
+        }
+
+        .hero-eyebrow {
+            display: inline-block;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: #f5c98a;
+            margin-bottom: 1.1rem;
+            border-bottom: 2px solid #c97c2e;
+            padding-bottom: .25rem;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 16px rgba(0,0,0,.35);
+        }
+
+        .hero-sub {
+            font-size: .97rem;
+            color: rgba(255, 255, 255, .72);
+            line-height: 1.75;
+            margin-bottom: 2.2rem;
+            max-width: 440px;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: .85rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero-primary {
+            background: #c97c2e;
+            color: #fff;
+            font-size: .88rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            padding: .75rem 2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background .18s ease, transform .18s ease;
+        }
+
+        .btn-hero-primary:hover {
+            background: #9b5c1a;
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .btn-hero-secondary {
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: .73rem 1.8rem;
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,.35);
+            text-decoration: none;
+            transition: background .18s ease;
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255,255,255,.22);
+            color: #fff;
+        }
+
+        /*  Footer  */
+        .land-footer {
+            background: #1c0e05;
+            color: rgba(255,255,255,.38);
+            text-align: center;
+            padding: 1.4rem;
+            font-size: .78rem;
+        }
+
+        .land-footer strong { color: #f5c98a; font-weight: 600; }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .site-nav { padding: 0 1.2rem; }
+            .nav-links { display: none; }
+            .hero { padding: 0 1.2rem; min-height: 480px; }
+        }
+    </style>
 </head>
-
 <body>
 
-    <div class="container mt-5">
 
-        <h1 class="display-4">
-            Trekking Management Application
-        </h1>
+<nav class="site-nav">
+    <a href="#" class="nav-brand">
+        <img src="/static/logo.png" alt="TrekALine" style="height:38px; width:38px; object-fit:contain; margin-right:.4rem;">
+        Trek<em>ALine</em>
+    </a>
 
-        <hr>
-
-        <p>
-            Welcome to the Trekking Management Application.
-        </p>
-
-        
-
+    <div class="nav-links">
+        <a href="{{ url_for('login') }}">Explore Treks</a>
+        <a href="{{ url_for('login') }}">My Bookings</a>
+        <a href="{{ url_for('login') }}">About</a>
     </div>
 
-</body>
+    <div class="nav-actions">
+        <a href="{{ url_for('login') }}" class="nav-login">Log In</a>
+        <a href="{{ url_for('register') }}" class="nav-register">Register</a>
+    </div>
+</nav>
 
+
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-eyebrow">Trekking Management Platform</span>
+        <h1 class="hero-title">Your Next<br>Trek Awaits</h1>
+        <p class="hero-sub">
+            Discover curated expeditions across the world. Admins manage, staff lead, trekkers explore.
+        </p>
+        <div class="hero-btns">
+            <a href="{{ url_for('login') }}" class="btn-hero-primary">Get Started</a>
+            <a href="{{ url_for('register') }}" class="btn-hero-secondary">Create Account</a>
+        </div>
+    </div>
+</section>
+
+
+<footer class="land-footer">
+    &copy; 2026 <strong>TrekALine</strong> &mdash; Trekking Management Platform
+</footer>
+
+</body>
 </html>

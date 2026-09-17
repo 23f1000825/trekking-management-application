@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 
-from application.config import LocalDevelopmentConfig
+from application.config import LocalDevelopmentConfig, ProductionConfig
 from application.database import db
 from application.database import login_manager
 from application.models import User
@@ -10,12 +10,18 @@ app = None
 
 
 def create_app():
-    app = Flask(__name__, template_folder="templates")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(base_dir, "templates"),
+        static_folder=os.path.join(base_dir, "static")
+    )
 
     app.secret_key = "trekking_management_secret_key"
 
-    if os.getenv("ENV", "development") == "production":
-        raise Exception("Currently no production config is setup.")
+    if os.getenv("ENV") == "production" or os.getenv("VERCEL"):
+        print("Starting Production Environment")
+        app.config.from_object(ProductionConfig)
     else:
         print("Starting Local Development")
         app.config.from_object(LocalDevelopmentConfig)
@@ -23,6 +29,19 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     app.app_context().push()
+
+    from datetime import timedelta
+
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
+
+    @app.after_request
+    def add_header(response):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "-1"
+        return response
 
     return app
 
@@ -35,10 +54,16 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-from application.controllers import *
+import application.controllers
 
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        if User.query.count() == 0:
+            from initial_data import seed
+            seed(app)
+    except Exception as e:
+        print("Database init exception:", e)
 
 
 if __name__ == "__main__":

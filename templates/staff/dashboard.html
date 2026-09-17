@@ -1,282 +1,156 @@
 {% extends "base_dashboard.html" %}
 
-{% block title %}
-Staff Dashboard
-{% endblock %}
-
-{% block panel_title %}
-Staff Panel
-{% endblock %}
+{% block title %}Staff Dashboard{% endblock %}
+{% block panel_title %}Staff Panel{% endblock %}
 
 {% block sidebar %}
-
-<div class="list-group list-group-flush">
-
-    <a href="{{ url_for('staff_dashboard') }}"
-       class="list-group-item list-group-item-action active">
-        Dashboard
-    </a>
-
-    <a href="{{ url_for('staff_profile') }}"
-       class="list-group-item list-group-item-action">
-        Profile
-    </a>
-
-    <a href="{{ url_for('logout') }}"
-       class="list-group-item list-group-item-action text-danger">
-        Logout
-    </a>
-
-</div>
-
+<a href="{{ url_for('staff_dashboard') }}" class="nav-item active">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('staff_profile') }}" class="nav-item">
+    <i class="bi bi-person-circle"></i> My Profile
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
 {% endblock %}
 
 {% block content %}
 
-<h2 class="mb-4">
-    My Dashboard
-</h2>
+<div class="page-header">
+    <h2>My Dashboard</h2>
+    <span class="text-muted-sm">Welcome back, <strong>{{ current_user.name }}</strong></span>
+</div>
 
-<div class="row mb-4">
 
+<div class="row g-3 mb-4">
     <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h6 class="text-muted">Assigned Treks</h6>
-                <h2>{{ total_treks }}</h2>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="bi bi-map-fill"></i></div>
+            <div>
+                <div class="stat-label">Assigned Treks</div>
+                <div class="stat-value">{{ total_treks }}</div>
             </div>
         </div>
     </div>
-
     <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h6 class="text-muted">Total Participants</h6>
-                <h2>{{ total_participants }}</h2>
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="bi bi-person-fill"></i></div>
+            <div>
+                <div class="stat-label">Total Participants</div>
+                <div class="stat-value">{{ total_participants }}</div>
             </div>
         </div>
     </div>
-
     <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h6 class="text-muted">Open Treks</h6>
-                <h2>{{ open_treks }}</h2>
+        <div class="stat-card amber">
+            <div class="stat-icon"><i class="bi bi-door-open-fill"></i></div>
+            <div>
+                <div class="stat-label">Open Treks</div>
+                <div class="stat-value">{{ open_treks }}</div>
             </div>
         </div>
     </div>
-
 </div>
 
-<h4 class="mb-3">
-    My Assigned Treks
-</h4>
 
-<div class="table-responsive">
-
-<table class="table table-bordered table-hover align-middle">
-
-    <thead class="table-light">
-
-        <tr>
-
-            <th>Trek Name</th>
-            <th>Location</th>
-            <th>Participants</th>
-            <th>Slots</th>
-            <th>Status</th>
-            <th width="120">Action</th>
-
-        </tr>
-
-    </thead>
-
-    <tbody>
-
-    {% for item in trek_data %}
-
-        <tr>
-
-            <td>{{ item.trek.trek_name }}</td>
-
-            <td>{{ item.trek.location }}</td>
-
-            <td>{{ item.participant_count }}</td>
-
-            <td>{{ item.trek.available_slots }}</td>
-
-            <td>
-
-                {% if item.trek.status == "Open" %}
-                    <span class="badge bg-success">Open</span>
-
-                {% elif item.trek.status == "Started" %}
-                    <span class="badge bg-primary">Started</span>
-
-                {% elif item.trek.status == "Ongoing" %}
-                    <span class="badge bg-warning text-dark">Ongoing</span>
-
-                {% elif item.trek.status == "Completed" %}
-                    <span class="badge bg-secondary">Completed</span>
-
-                {% else %}
-                    <span class="badge bg-danger">Closed</span>
-                {% endif %}
-
-            </td>
-
-            <td>
-
-                <a
-                href="{{ url_for('staff_trek', trek_id=item.trek.trek_id) }}"
-                class="btn btn-outline-primary btn-sm">
-
-                    Manage
-
-                </a>
-
-            </td>
-
-        </tr>
-
-    {% endfor %}
-
-    {% if trek_data|length == 0 %}
-
-        <tr>
-
-            <td colspan="6" class="text-center text-muted">
-
-                No treks assigned.
-
-            </td>
-
-        </tr>
-
-    {% endif %}
-
-    </tbody>
-
-</table>
-
-</div>
-
-<hr class="my-4">
-
-<div class="card shadow-sm">
-
-    <div class="card-body">
-
-        <h4 class="text-center mb-4">
-            Participants per Trek
-        </h4>
-
-        <div style="height:350px;">
-
-            <canvas id="participantChart"></canvas>
-
-        </div>
-
+<div class="tm-card mb-4">
+    <div class="tm-card-header">
+        <i class="bi bi-table"></i> My Assigned Treks
+        <span class="ms-auto text-muted-sm">{{ trek_data|length }} total</span>
     </div>
-
+    <div style="overflow-x:auto;">
+        <table class="tm-table" id="staff-treks-table">
+            <thead>
+                <tr>
+                    <th>Trek Name</th>
+                    <th>Location</th>
+                    <th>Participants</th>
+                    <th>Available Slots</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in trek_data %}
+            <tr>
+                <td style="font-weight:600;">{{ item.trek.trek_name }}</td>
+                <td>
+                    <span style="display:flex;align-items:center;gap:.3rem;color:#5a8a7a;">
+                        <i class="bi bi-geo-alt" style="font-size:.8rem;"></i>
+                        {{ item.trek.location }}
+                    </span>
+                </td>
+                <td>
+                    <span style="font-weight:700;color:var(--clr-accent);">{{ item.participant_count }}</span>
+                    <span class="text-muted-sm"> booked</span>
+                </td>
+                <td>{{ item.trek.available_slots }}</td>
+                <td>
+                    {% if item.trek.status == "Open" %}<span class="badge-pill open">Open</span>
+                    {% elif item.trek.status == "Started" %}<span class="badge-pill started">Started</span>
+                    {% elif item.trek.status == "Ongoing" %}<span class="badge-pill ongoing">Ongoing</span>
+                    {% elif item.trek.status == "Completed" %}<span class="badge-pill completed">Completed</span>
+                    {% else %}<span class="badge-pill closed">Closed</span>{% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('staff_trek', trek_id=item.trek.trek_id) }}" class="btn-tm-secondary btn-sm-icon">
+                        <i class="bi bi-gear-fill"></i> Manage
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        <i class="bi bi-map"></i>
+                        <p>No treks assigned to you yet.</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
+
+<div class="chart-card">
+    <h5><i class="bi bi-bar-chart-fill"></i> Participants per Trek</h5>
+    <div style="height:300px; position:relative;">
+        <canvas id="participantChart"></canvas>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-
 const trekLabels = {{ trek_labels | tojson | safe }};
 const participantCounts = {{ participant_counts | tojson | safe }};
 
 new Chart(document.getElementById("participantChart"), {
-
     type: "bar",
-
     data: {
-
         labels: trekLabels,
-
         datasets: [{
-
             label: "Participants",
-
             data: participantCounts,
-
-            backgroundColor: "#0d6efd",
+            backgroundColor: "#2d7a5f",
             borderRadius: 8,
             maxBarThickness: 55
-
         }]
-
     },
-
     options: {
-
-        responsive: true,
-
-        maintainAspectRatio: false,
-
-        plugins: {
-
-            legend: {
-
-                display: false
-
-            },
-
-            title: {
-
-                display: true,
-                text: "Number of Participants in Each Assigned Trek",
-                font: {
-
-                    size: 16
-
-                }
-
-            }
-
-        },
-
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
         scales: {
-
-            x: {
-
-                title: {
-
-                    display: true,
-                    text: "Treks"
-
-                }
-
-            },
-
-            y: {
-
-                beginAtZero: true,
-
-                ticks: {
-
-                    precision: 0,
-                    stepSize: 1
-
-                },
-
-                title: {
-
-                    display: true,
-                    text: "Participants"
-
-                }
-
-            }
-
+            y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1, font: { family: 'Inter' } }, grid: { color: "#eef1f0" } },
+            x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }
         }
-
     }
-
 });
-
 </script>
-
 {% endblock %}

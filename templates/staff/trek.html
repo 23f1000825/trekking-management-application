@@ -1,190 +1,189 @@
 {% extends "base_dashboard.html" %}
 
-{% block title %}
-Manage Trek
-{% endblock %}
-
-{% block panel_title %}
-Staff Panel
-{% endblock %}
+{% block title %}Manage Trek — {{ trek.trek_name }}{% endblock %}
+{% block panel_title %}Staff Panel{% endblock %}
 
 {% block sidebar %}
-
-<div class="list-group list-group-flush">
-
-<a href="{{ url_for('staff_dashboard') }}"
-class="list-group-item list-group-item-action">
-
-Dashboard
-
+<a href="{{ url_for('staff_dashboard') }}" class="nav-item">
+    <i class="bi bi-speedometer2"></i> Dashboard
 </a>
-
-<a href="{{ url_for('staff_profile') }}"
-class="list-group-item list-group-item-action">
-
-Profile
-
+<a href="{{ url_for('staff_profile') }}" class="nav-item">
+    <i class="bi bi-person-circle"></i> My Profile
 </a>
-
-<a href="{{ url_for('logout') }}"
-class="list-group-item list-group-item-action text-danger">
-
-Logout
-
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
 </a>
-
-</div>
-
 {% endblock %}
 
 {% block content %}
 
-<h2>{{ trek.trek_name }}</h2>
-
-<hr>
-
-<form method="POST">
-
-<div class="row">
-
-<div class="col-md-6">
-
-<label>Location</label>
-
-<input
-class="form-control mb-3"
-value="{{ trek.location }}"
-readonly>
-
-<label>Duration (Days)</label>
-
-<input
-class="form-control mb-3"
-value="{{ trek.duration }}"
-readonly>
-
-<label>Start Date</label>
-
-<input
-class="form-control mb-3"
-value="{{ trek.start_date }}"
-readonly>
-
-<label>End Date</label>
-
-<input
-class="form-control mb-3"
-value="{{ trek.end_date }}"
-readonly>
-
+<div class="page-header">
+    <div>
+        <h2>{{ trek.trek_name }}</h2>
+        <span class="text-muted-sm">
+            <i class="bi bi-geo-alt me-1"></i>{{ trek.location }}
+        </span>
+    </div>
+    <a href="{{ url_for('staff_dashboard') }}" class="btn-tm-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
 </div>
 
-<div class="col-md-6">
+<!-- Unified Main Card Box -->
+<div class="tm-card mb-4">
+    <div class="tm-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-sliders me-2"></i>Trek Management & Details</span>
+        {% if trek.status == "Open" %}<span class="badge-pill open">Open</span>
+        {% elif trek.status == "Started" %}<span class="badge-pill started">Started</span>
+        {% elif trek.status == "Completed" %}<span class="badge-pill completed">Completed</span>
+        {% else %}<span class="badge-pill closed">{{ trek.status }}</span>{% endif %}
+    </div>
 
-<label>Total Slots</label>
+    <div class="tm-card-body">
+        
+        <!-- Section 1: Trek Details Summary Grid -->
+        <div class="row g-3 mb-4 p-3" style="background: rgba(0,0,0,0.02); border-radius: 10px; border: 1px solid rgba(0,0,0,0.06);">
+            <div class="col-md-3 col-sm-6">
+                <label class="text-muted-sm d-block mb-1" style="font-size:0.75rem; font-weight:600; text-transform:uppercase;">Location</label>
+                <div style="font-weight:600; color:#111c19; font-size:0.95rem;">
+                    <i class="bi bi-geo-alt me-1 text-muted"></i>{{ trek.location }}
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <label class="text-muted-sm d-block mb-1" style="font-size:0.75rem; font-weight:600; text-transform:uppercase;">Duration</label>
+                <div style="font-weight:600; color:#111c19; font-size:0.95rem;">
+                    <i class="bi bi-clock me-1 text-muted"></i>{{ trek.duration }} Days
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <label class="text-muted-sm d-block mb-1" style="font-size:0.75rem; font-weight:600; text-transform:uppercase;">Total Capacity</label>
+                <div style="font-weight:600; color:#111c19; font-size:0.95rem;">
+                    <i class="bi bi-people me-1 text-muted"></i>{{ total_slots }} Slots
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <label class="text-muted-sm d-block mb-1" style="font-size:0.75rem; font-weight:600; text-transform:uppercase;">Trek Dates</label>
+                <div style="font-weight:600; color:#111c19; font-size:0.88rem;">
+                    <i class="bi bi-calendar-event me-1 text-muted"></i>
+                    {% if trek.start_date %}{{ trek.start_date.strftime('%d %b') }}{% endif %}
+                    {% if trek.end_date %} – {{ trek.end_date.strftime('%d %b %Y') }}{% endif %}
+                </div>
+            </div>
+        </div>
 
-<input
-class="form-control mb-3"
-value="{{ total_slots }}"
-readonly>
+        <!-- Section 2: Updation Form (Slots & Status Actions) -->
+        <form method="POST" id="manage-trek-form" class="mb-4 pb-4" style="border-bottom: 1px solid var(--border-color, #e5e7eb);">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label-tm" for="available_slots">Available Slots</label>
+                    <input type="number" id="available_slots" name="available_slots"
+                           class="form-control-tm" min="0"
+                           value="{{ trek.available_slots }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label-tm">Current Status</label>
+                    <div style="padding:.4rem 0;">
+                        {% if trek.status == "Open" %}<span class="badge-pill open">Open</span>
+                        {% elif trek.status == "Started" %}<span class="badge-pill started">Started</span>
+                        {% elif trek.status == "Completed" %}<span class="badge-pill completed">Completed</span>
+                        {% else %}<span class="badge-pill closed">{{ trek.status }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+                        <button type="submit" name="action" value="update" class="btn-tm-secondary">
+                            Update
+                        </button>
+                        <button type="submit" name="action" value="started" class="btn-tm-secondary">
+                            Mark Started
+                        </button>
+                        <button type="submit" name="action" value="completed" class="btn-tm-primary">
+                            Mark Completed
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
 
-<label>Available Slots</label>
+        <!-- Section 3: Booked Users & Management Table -->
+        <div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="m-0" style="font-weight:600; font-size:1rem; color:#111c19;">
+                    <i class="bi bi-people-fill me-2"></i>Booked Users & Management
+                </h5>
+                <span class="badge bg-light text-dark" style="font-size: 0.85rem; border:1px solid #ccc;">{{ bookings|length }} Booked</span>
+            </div>
 
-<input
-type="number"
-name="available_slots"
-class="form-control mb-3"
-value="{{ trek.available_slots }}">
+            <div style="overflow-x:auto;">
+                <table class="tm-table" id="participants-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Booking Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:.5rem;">
+                                <div class="avatar-init" style="width:28px;height:28px;font-size:.7rem;background:linear-gradient(135deg,#2563eb,#1d4ed8);">
+                                    {{ booking.user.name[:1].upper() }}
+                                </div>
+                                <span style="font-weight:600;">{{ booking.user.name }}</span>
+                            </div>
+                        </td>
+                        <td style="font-size:.85rem; color:#555;">
+                            {{ booking.user.email }}
+                        </td>
+                        <td style="font-size:.82rem;color:#5a8a7a;">
+                            {% if booking.booking_date %}
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ booking.booking_date.strftime('%d %b %Y') }}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td>
+                            {% if booking.booking_status == "Booked" %}<span class="badge-pill booked">Booked</span>
+                            {% elif booking.booking_status == "Completed" %}<span class="badge-pill completed">Completed</span>
+                            {% elif booking.booking_status == "Cancelled" %}<span class="badge-pill cancelled">Cancelled</span>
+                            {% else %}<span class="badge-pill">{{ booking.booking_status }}</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if booking.booking_status == "Booked" %}
+                            <form method="POST" style="display:inline-flex; gap: 0.25rem; margin:0;">
+                                <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
+                                <button type="submit" name="action" value="complete_booking" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size:0.78rem;">
+                                    Mark Completed
+                                </button>
+                                <button type="submit" name="action" value="cancel_booking" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size:0.78rem;" onclick="return confirm('Cancel this user\'s booking?');">
+                                    Cancel
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted" style="font-size:0.8rem;">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <p>No participants booked yet.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-<label>Status</label>
-
-<input
-class="form-control"
-value="{{ trek.status }}"
-readonly>
-
+    </div>
 </div>
-
-</div>
-
-<hr>
-
-<h4>Participants ({{ bookings|length }})</h4>
-
-<table class="table table-bordered">
-
-<thead>
-
-<tr>
-
-<th>User</th>
-
-<th>Booking Date</th>
-
-<th>Status</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for booking in bookings %}
-
-<tr>
-
-<td>{{ booking.user.name }}</td>
-
-<td>
-    {% if booking.booking_date %}
-        {{ booking.booking_date.strftime('%d-%m-%Y') }}
-    {% else %}
-        -
-    {% endif %}
-</td>
-
-<td>{{ booking.booking_status }}</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-<div class="mt-4">
-
-<button
-type="submit"
-name="action"
-value="started"
-class="btn btn-primary">
-
-Mark as Started
-
-</button>
-
-<button
-type="submit"
-name="action"
-value="completed"
-class="btn btn-success">
-
-Mark as Completed
-
-</button>
-
-<a
-href="{{ url_for('staff_dashboard') }}"
-class="btn btn-secondary">
-
-Back
-
-</a>
-
-</div>
-
-</form>
 
 {% endblock %}

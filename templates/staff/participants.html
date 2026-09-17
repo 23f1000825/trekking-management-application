@@ -1,93 +1,79 @@
 {% extends "base_dashboard.html" %}
 
-{% block title %}
-Participants
-{% endblock %}
-
-{% block panel_title %}
-Staff Panel
-{% endblock %}
+{% block title %}Participants — {{ trek.trek_name }}{% endblock %}
+{% block panel_title %}Staff Panel{% endblock %}
 
 {% block sidebar %}
-
-<div class="list-group list-group-flush">
-
-    <a href="{{ url_for('staff_dashboard') }}"
-       class="list-group-item list-group-item-action">
-        Dashboard
-    </a>
-
-    <a href="{{ url_for('staff_profile') }}"
-       class="list-group-item list-group-item-action">
-        Profile
-    </a>
-
-    <a href="{{ url_for('logout') }}"
-       class="list-group-item list-group-item-action text-danger">
-        Logout
-    </a>
-
-</div>
-
+<a href="{{ url_for('staff_dashboard') }}" class="nav-item">
+    <i class="bi bi-speedometer2"></i> Dashboard
+</a>
+<a href="{{ url_for('staff_profile') }}" class="nav-item">
+    <i class="bi bi-person-circle"></i> My Profile
+</a>
+<hr class="nav-divider">
+<a href="{{ url_for('logout') }}" class="nav-item danger">
+    <i class="bi bi-box-arrow-right"></i> Logout
+</a>
 {% endblock %}
 
 {% block content %}
 
-<h2 class="mb-4">
-{{ trek.trek_name }} Participants
-</h2>
-
-<div class="table-responsive">
-
-<table class="table table-bordered align-middle">
-
-<thead class="table-light">
-
-<tr>
-
-<th>User ID</th>
-<th>Name</th>
-<th>Booking Status</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for booking in bookings %}
-
-<tr>
-
-<td>{{ booking.user.user_id }}</td>
-
-<td>{{ booking.user.name }}</td>
-
-<td>{{ booking.booking_status }}</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
+<div class="page-header">
+    <h2><i class="bi bi-people-fill me-2" style="font-size:1.3rem;color:var(--clr-accent);"></i>{{ trek.trek_name }} — Participants</h2>
+    <a href="{{ url_for('staff_dashboard') }}" class="btn-tm-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
 </div>
 
-{% if bookings|length == 0 %}
-
-<div class="alert alert-info">
-No participants yet.
+<div class="tm-card">
+    <div class="tm-card-header">
+        <i class="bi bi-person-lines-fill"></i> Participant List
+        <span class="ms-auto text-muted-sm">{{ bookings|length }} total</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="tm-table" id="participants-list-table">
+            <thead>
+                <tr>
+                    <th>Participant</th>
+                    <th>Email</th>
+                    <th>Booking Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>
+                    <div style="display:flex;align-items:center;gap:.6rem;">
+                        <div class="avatar-init" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">
+                            {{ booking.user.name[:1].upper() }}
+                        </div>
+                        <div>
+                            <div style="font-weight:600;font-size:.88rem;">{{ booking.user.name }}</div>
+                            <div class="text-muted-sm">ID #{{ booking.user.user_id }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ booking.user.email }}</td>
+                <td>
+                    {% if booking.booking_status == "Booked" %}<span class="badge-pill booked">Booked</span>
+                    {% elif booking.booking_status == "Completed" %}<span class="badge-pill completed">Completed</span>
+                    {% elif booking.booking_status == "Cancelled" %}<span class="badge-pill cancelled">Cancelled</span>
+                    {% else %}<span class="badge-pill">{{ booking.booking_status }}</span>{% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">
+                    <div class="empty-state">
+                        <i class="bi bi-people"></i>
+                        <p>No participants have booked this trek yet.</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-
-{% endif %}
-
-<a href="{{ url_for('staff_dashboard') }}"
-class="btn btn-secondary">
-
-Back
-
-</a>
 
 {% endblock %}
